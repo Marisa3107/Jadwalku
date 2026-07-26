@@ -20,44 +20,12 @@ function getPekan() {
   return 'pekan2';
 }
 
-async function kirimTelegram(pesan) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  
-  // Ini penting buat debug!
-  console.log('🚀 Token dari env:', token ? 'ADA' : 'TIDAK ADA');
-  console.log('🚀 Chat ID dari env:', chatId ? 'ADA' : 'TIDAK ADA');
-
-  if (!token || !chatId) {
-    console.log('❌ Token atau Chat ID tidak ditemukan di environment!');
-    return;
-  }
-
-  try {
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    const response = await axios.post(url, {
-      chat_id: chatId,
-      text: pesan,
-      parse_mode: 'HTML'
-    });
-    console.log('✅ Telegram BERHASIL dikirim!');
-    console.log('📨 Response:', response.data);
-  } catch (error) {
-    console.error('❌ Gagal kirim Telegram:', error.response?.data || error.message);
-  }
-}
-
 export async function GET() {
   try {
-    console.log('⏳ API /api/cron dipanggil!');
-    
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
     const hariIni = days[today.getDay()];
     const pekan = getPekan();
-    
-    console.log(`📅 Hari: ${hariIni}, Pekan: ${pekan}`);
-    
     const semuaJadwal = getJadwal();
     const jadwalHariIni = semuaJadwal[pekan][hariIni] || [];
     
@@ -75,9 +43,18 @@ export async function GET() {
       });
     }
     
-    console.log('📨 Mencoba kirim ke Telegram...');
-    await kirimTelegram(pesan);
-    console.log('✅ Proses selesai!');
+    // ⚠️ GANTI INI DENGAN TOKEN DAN CHAT ID ASLI KAMU!
+    const TOKEN = '8860261405:AAHjKOzyVXCglqHrpJm7Xb4he1mGkCqURlY'; // Ganti!
+    const CHAT_ID = '5698906519'; // Ganti!
+    
+    const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+    await axios.post(url, {
+      chat_id: CHAT_ID,
+      text: pesan,
+      parse_mode: 'HTML'
+    });
+    
+    console.log('✅ Pesan Telegram terkirim!');
     
     return NextResponse.json({ 
       message: 'Cron job berhasil dijalankan!', 
@@ -88,7 +65,7 @@ export async function GET() {
     });
     
   } catch (error) {
-    console.error('❌ Error utama:', error.message);
+    console.error('❌ Error:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
