@@ -1,28 +1,28 @@
 {
   "pekan1": {
-    "senin": ["Matematika", "Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya"],
-    "selasa": ["Fisika", "Kimia", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
-    "rabu": ["Bahasa Indonesia", "Inggris", "Matematika", "IPA", "PKN", "Agama", "Seni Budaya"],
-    "kamis": ["Kimia", "Fisika", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
-    "jumat": ["Agama", "PKN", "Bahasa Indonesia", "Inggris", "Matematika", "IPA"],
+    "senin": ["B.DAERAH 3x", "PAI 3x", "SEJARAH 3x"],
+    "selasa": ["MATEMATIKA 2x", "PPKN 2x", "PAI 2x", "B.INDONESIA 3x"],
+    "rabu": ["PRODUKTIF 3x", "B.INDONESIA 3x", "B.INGGRIS 2x", "PPKN 2x"],
+    "kamis": ["B.INDONESIA 3x", "PJOK 2x", "SEJARAH 3x", "PPKN 2x"],
+    "jumat": ["PILIHAN 5x", "B.INGGRIS 2x", "PRODUKTIF 2x"],
     "sabtu": [],
     "minggu": []
   },
   "pekan2": {
-    "senin": ["Fisika", "Kimia", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
-    "selasa": ["Matematika", "Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya"],
-    "rabu": ["Kimia", "Fisika", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
-    "kamis": ["Bahasa Indonesia", "Inggris", "Matematika", "IPA", "PKN", "Agama", "Seni Budaya"],
-    "jumat": ["PKN", "Agama", "Inggris", "Bahasa Indonesia", "IPA", "Matematika"],
+    "senin": ["PRODUKTIF 9x (FULL)"],
+    "selasa": ["PAI 3x", "PRODUKTIF 7x"],
+    "rabu": ["B.INGGRIS 3x", "PJOK 2x", "PKWU 5x"],
+    "kamis": ["PRODUKTIF 8x", "MATEMATIKA 2x"],
+    "jumat": ["PILIHAN 5x", "PRODUKTIF 4x"],
     "sabtu": [],
     "minggu": []
   },
   "pekan3": {
-    "senin": ["Sejarah", "Geografi", "Olahraga", "Matematika", "Fisika", "Kimia", "Biologi"],
-    "selasa": ["IPA", "Inggris", "Agama", "PKN", "Seni Budaya", "Matematika", "Bahasa Indonesia"],
-    "rabu": ["Matematika", "Fisika", "Kimia", "Biologi", "Sejarah", "Geografi", "Olahraga"],
-    "kamis": ["Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya", "Matematika"],
-    "jumat": ["Inggris", "Matematika", "IPA", "Bahasa Indonesia", "PKN", "Agama"],
+    "senin": ["PKWU 3x", "MATEMATIKA 2x", "B.INGGRIS 2x", "PRODUKTIF 2x"],
+    "selasa": ["PRODUKTIF 2x", "B.INGGRIS 3x", "PJOK 2x", "PRODUKTIF 3x"],
+    "rabu": ["PKWU 3x", "PRODUKTIF 4x", "B.DAERAH 3x"],
+    "kamis": ["MATEMATIKA 3x", "PRODUKTIF 7x"],
+    "jumat": ["PILIHAN 5x", "PKWU 4x"],
     "sabtu": [],
     "minggu": []
   }

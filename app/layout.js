@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Jadwal Sekolah',
+  title: 'Jadwal Sekolah [XI-PPLG]',
   description: 'Notifikasi jadwal sekolah otomatis',
 };
 

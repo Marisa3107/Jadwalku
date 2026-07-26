@@ -11,8 +11,9 @@ function getJadwal() {
 
 // Fungsi untuk menentukan pekan ke berapa
 function getPekan() {
-  // Ganti tanggal ini sesuai awal semester kamu!
-  const startDate = new Date(2026, 6, 1); // 1 Juli 2026
+  // 📅 SESUAIKAN DENGAN JADWAL SEKOLAH KAMU!
+  // PEKAN 1 dimulai 13 Juli 2026
+  const startDate = new Date(2026, 6, 13); // 13 Juli 2026
   const today = new Date();
   
   const diffTime = Math.abs(today - startDate);
@@ -44,11 +45,12 @@ export async function GET() {
       pesan += '🎉 LIBUR! Tidak ada jadwal hari ini.';
     } else {
       jadwalHariIni.forEach((mapel, index) => {
-        pesan += `${index + 1}. ${mapel}\n`;
+        const jam = 7 + index; // ⏰ Mulai jam 7 pagi (sesuai sekolah)
+        pesan += `${jam}.00 - ${mapel}\n`;
       });
     }
     
-    console.log(pesan); // Nanti kalo udah deploy, ini akan muncul di log Vercel
+    console.log(pesan);
     
     return NextResponse.json({ 
       message: 'Cron job berhasil dijalankan!', 
