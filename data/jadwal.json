@@ -1,0 +1,29 @@
+{
+  "pekan1": {
+    "senin": ["Matematika", "Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya"],
+    "selasa": ["Fisika", "Kimia", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
+    "rabu": ["Bahasa Indonesia", "Inggris", "Matematika", "IPA", "PKN", "Agama", "Seni Budaya"],
+    "kamis": ["Kimia", "Fisika", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
+    "jumat": ["Agama", "PKN", "Bahasa Indonesia", "Inggris", "Matematika", "IPA"],
+    "sabtu": [],
+    "minggu": []
+  },
+  "pekan2": {
+    "senin": ["Fisika", "Kimia", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
+    "selasa": ["Matematika", "Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya"],
+    "rabu": ["Kimia", "Fisika", "Biologi", "Matematika", "Sejarah", "Geografi", "Olahraga"],
+    "kamis": ["Bahasa Indonesia", "Inggris", "Matematika", "IPA", "PKN", "Agama", "Seni Budaya"],
+    "jumat": ["PKN", "Agama", "Inggris", "Bahasa Indonesia", "IPA", "Matematika"],
+    "sabtu": [],
+    "minggu": []
+  },
+  "pekan3": {
+    "senin": ["Sejarah", "Geografi", "Olahraga", "Matematika", "Fisika", "Kimia", "Biologi"],
+    "selasa": ["IPA", "Inggris", "Agama", "PKN", "Seni Budaya", "Matematika", "Bahasa Indonesia"],
+    "rabu": ["Matematika", "Fisika", "Kimia", "Biologi", "Sejarah", "Geografi", "Olahraga"],
+    "kamis": ["Bahasa Indonesia", "IPA", "Inggris", "Agama", "PKN", "Seni Budaya", "Matematika"],
+    "jumat": ["Inggris", "Matematika", "IPA", "Bahasa Indonesia", "PKN", "Agama"],
+    "sabtu": [],
+    "minggu": []
+  }
+}
