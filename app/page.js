@@ -89,9 +89,8 @@ export default function Home() {
 
   return (
     <>
-      {/* ===== GOOGLE FONT INTER ===== */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
         * {
           margin: 0;
           padding: 0;
@@ -101,6 +100,48 @@ export default function Home() {
           margin: 0;
           padding: 0;
           overflow-x: hidden;
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(30px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .card {
+          animation: fadeSlideUp 0.7s ease-out forwards;
+        }
+        .item {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: default;
+        }
+        .item:hover {
+          transform: translateX(6px) scale(1.01);
+          background: rgba(255,255,255,0.08) !important;
+          box-shadow: 0 4px 24px rgba(78, 205, 196, 0.08);
+        }
+        .badge-pekan {
+          animation: pulse 2s ease-in-out infinite;
+        }
+        .grid-number {
+          display: inline-block;
+          animation: float 3s ease-in-out infinite;
+        }
+        .greeting-text {
+          background: linear-gradient(135deg, #ffffff 0%, #4ECDC4 50%, #45B7D1 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shimmer 4s linear infinite;
         }
       `}</style>
 
@@ -201,7 +242,7 @@ export default function Home() {
         </div>
 
         {/* ===== CARD ===== */}
-        <div style={{
+        <div className="card" style={{
           width: '100%',
           maxWidth: '420px',
           position: 'relative',
@@ -213,15 +254,7 @@ export default function Home() {
           padding: '28px 24px',
           boxShadow: '0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.05)',
-          animation: 'fadeUp 0.7s ease-out'
         }}>
-          <style>{`
-            @keyframes fadeUp {
-              from { opacity: 0; transform: translateY(30px) scale(0.96); }
-              to { opacity: 1; transform: translateY(0) scale(1); }
-            }
-          `}</style>
-
           {/* ===== HEADER ===== */}
           <div style={{
             textAlign: 'center',
@@ -230,14 +263,13 @@ export default function Home() {
             borderBottom: '1px solid rgba(255,255,255,0.04)'
           }}>
             <h1 style={{
-              fontSize: '24px',
-              fontWeight: '600',
+              fontSize: '26px',
+              fontWeight: '700',
               margin: 0,
-              color: '#FFFFFF',
-              textShadow: '0 2px 20px rgba(0,0,0,0.2)',
-              letterSpacing: '-0.3px'
+              fontFamily: "'Playfair Display', serif",
+              letterSpacing: '-0.5px'
             }}>
-              {greeting} 👋
+              <span className="greeting-text">{greeting}</span> 👋
             </h1>
             <p style={{
               fontSize: '12px',
@@ -255,24 +287,24 @@ export default function Home() {
               marginTop: '12px',
               flexWrap: 'wrap'
             }}>
-              <span style={{
+              <span className="badge-pekan" style={{
                 padding: '4px 14px',
                 background: 'rgba(78, 205, 196, 0.15)',
                 borderRadius: '50px',
                 fontSize: '11px',
-                fontWeight: '500',
+                fontWeight: '600',
                 color: '#4ECDC4',
                 letterSpacing: '0.3px',
                 border: '1px solid rgba(78, 205, 196, 0.1)'
               }}>
                 📖 {jadwal?.pekan?.toUpperCase() || 'PEKAN'}
               </span>
-              <span style={{
+              <span className="badge-pekan" style={{
                 padding: '4px 14px',
                 background: 'rgba(69, 183, 209, 0.15)',
                 borderRadius: '50px',
                 fontSize: '11px',
-                fontWeight: '500',
+                fontWeight: '600',
                 color: '#45B7D1',
                 letterSpacing: '0.3px',
                 border: '1px solid rgba(69, 183, 209, 0.1)'
@@ -294,13 +326,25 @@ export default function Home() {
               borderRadius: '14px',
               padding: '12px 8px',
               border: '1px solid rgba(255,255,255,0.04)',
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease'
             }}>
               <div style={{ fontSize: '22px' }}>📚</div>
-              <div style={{ fontSize: '20px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+              <div className="grid-number" style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#FFFFFF',
+                letterSpacing: '-0.3px'
+              }}>
                 {totalMapel}
               </div>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: '400', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              <div style={{
+                fontSize: '10px',
+                color: 'rgba(255,255,255,0.25)',
+                fontWeight: '500',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase'
+              }}>
                 Mata Pelajaran
               </div>
             </div>
@@ -309,13 +353,25 @@ export default function Home() {
               borderRadius: '14px',
               padding: '12px 8px',
               border: '1px solid rgba(255,255,255,0.04)',
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease'
             }}>
               <div style={{ fontSize: '22px' }}>{isLibur ? '🎉' : '📖'}</div>
-              <div style={{ fontSize: '20px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+              <div className="grid-number" style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#FFFFFF',
+                letterSpacing: '-0.3px'
+              }}>
                 {isLibur ? 'Libur' : 'Sekolah'}
               </div>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: '400', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              <div style={{
+                fontSize: '10px',
+                color: 'rgba(255,255,255,0.25)',
+                fontWeight: '500',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase'
+              }}>
                 Status Hari
               </div>
             </div>
@@ -331,7 +387,7 @@ export default function Home() {
           }}>
             <span style={{
               fontSize: '12px',
-              fontWeight: '500',
+              fontWeight: '600',
               color: 'rgba(255,255,255,0.25)',
               letterSpacing: '0.5px',
               textTransform: 'uppercase'
@@ -355,12 +411,13 @@ export default function Home() {
               borderRadius: '16px',
               border: '1px solid rgba(255,255,255,0.03)'
             }}>
-              <span style={{ fontSize: '48px' }}>🎉</span>
+              <span style={{ fontSize: '48px', display: 'inline-block', animation: 'float 3s ease-in-out infinite' }}>🎉</span>
               <h3 style={{
                 color: '#FFFFFF',
                 fontSize: '18px',
                 margin: '8px 0 4px',
                 fontWeight: '500',
+                fontFamily: "'Playfair Display', serif",
                 letterSpacing: '-0.2px'
               }}>
                 Libur!
@@ -379,17 +436,21 @@ export default function Home() {
                 const jam = 7 + index;
                 const color = colors[index % colors.length];
                 return (
-                  <div key={index} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '10px 12px',
-                    marginBottom: '6px',
-                    background: 'rgba(255,255,255,0.03)',
-                    borderRadius: '12px',
-                    borderLeft: `3px solid ${color}`,
-                    transition: 'all 0.2s ease',
-                    border: '1px solid rgba(255,255,255,0.03)'
-                  }}>
+                  <div
+                    key={index}
+                    className="item"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '10px 12px',
+                      marginBottom: '6px',
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '12px',
+                      borderLeft: `3px solid ${color}`,
+                      border: `1px solid rgba(255,255,255,0.03)`,
+                      animationDelay: `${index * 0.05}s`
+                    }}
+                  >
                     <div style={{
                       width: '26px',
                       height: '26px',
@@ -400,10 +461,11 @@ export default function Home() {
                       justifyContent: 'center',
                       color: '#fff',
                       fontSize: '11px',
-                      fontWeight: '600',
+                      fontWeight: '700',
                       marginRight: '12px',
                       flexShrink: 0,
-                      boxShadow: `0 2px 12px ${color}20`
+                      boxShadow: `0 2px 12px ${color}20`,
+                      transition: 'all 0.3s ease'
                     }}>
                       {jam}
                     </div>
@@ -419,7 +481,8 @@ export default function Home() {
                     </span>
                     <span style={{
                       fontSize: '16px',
-                      opacity: 0.15
+                      opacity: 0.15,
+                      transition: 'all 0.3s ease'
                     }}>
                       {['📐','🔬','📖','✏️','🧮','🎨','🏃','💻','📝','🌍'][index % 10]}
                     </span>
@@ -483,7 +546,7 @@ export default function Home() {
               fontWeight: '400',
               letterSpacing: '0.3px'
             }}>
-              ✨ v2.4
+              ✨ v2.5
             </span>
           </div>
         </div>
