@@ -26,7 +26,6 @@ async function kirimTelegram(pesan) {
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
 
   try {
-    console.log('⏳ Mencoba kirim ke Telegram...');
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -38,21 +37,29 @@ async function kirimTelegram(pesan) {
     });
 
     const result = await response.json();
-    console.log('📨 Response dari Telegram:', result);
-
-    if (response.ok) {
-      console.log('✅ PESAN TELEGRAM BERHASIL TERKIRIM!');
-    } else {
-      console.log('❌ TELEGRAM NGASIH ERROR:', result.description);
-    }
+    console.log('✅ Telegram response:', result);
   } catch (error) {
-    console.error('❌ GAGAL KIRIM TELEGRAM:', error.message);
+    console.error('❌ Gagal kirim Telegram:', error.message);
   }
 }
 
 export async function GET() {
-  console.log('⏳ API /api/cron dipanggil!');
   try {
+    const now = new Date();
+    const jam = now.getHours();
+    const menit = now.getMinutes();
+
+    // ✅ HANYA JAM 5.20 PAGI YANG BISA KIRIM!
+    if (jam !== 5 || menit !== 20) {
+      console.log(`⏰ Bukan jam 5.20 (sekarang ${jam}:${menit}), skip kirim`);
+      return NextResponse.json({
+        message: 'Bukan jam 5.20, pesan tidak dikirim',
+        currentTime: `${jam}:${menit}`,
+        status: 'skipped'
+      });
+    }
+
+    // ===== INI CUMA EKSEKUSI JAM 5.20 =====
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
     const hariIni = days[today.getDay()];
@@ -70,23 +77,24 @@ export async function GET() {
       pesan += '🎉 LIBUR! Tidak ada jadwal hari ini.';
     } else {
       jadwalHariIni.forEach((mapel, index) => {
-        const jam = 7 + index;
-        pesan += `${jam}.00 - ${mapel}\n`;
+        const jamPelajaran = 7 + index;
+        pesan += `${jamPelajaran}.00 - ${mapel}\n`;
       });
     }
 
-    console.log('📝 Isi Pesan:', pesan);
     await kirimTelegram(pesan);
+    console.log('✅ Pesan dikirim jam 5.20!');
 
     return NextResponse.json({
-      message: 'API dijalankan!',
+      message: 'Pesan dikirim!',
       jadwal: jadwalHariIni,
       pekan: pekan,
       hari: hariIni,
+      status: 'sent'
     });
 
   } catch (error) {
-    console.error('❌ ERROR UTAMA:', error.message);
+    console.error('❌ Error:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
