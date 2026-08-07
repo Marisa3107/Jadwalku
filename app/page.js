@@ -105,6 +105,13 @@ export default function Home() {
   const totalMapel = jadwal?.jadwal?.length || 0;
   const hari = jadwal?.hari?.charAt(0).toUpperCase() + jadwal?.hari?.slice(1) || '';
 
+  // Format pekan: "pekan1" → "PEKAN 1"
+  const formatPekan = (pekan) => {
+    if (!pekan) return 'PEKAN';
+    const number = pekan.replace('pekan', '');
+    return `PEKAN ${number.toUpperCase()}`;
+  };
+
   return (
     <>
       <style>{`
@@ -158,9 +165,6 @@ export default function Home() {
             0 0 80px rgba(69, 183, 209, 0.1);
           font-weight: 700;
           letter-spacing: -0.3px;
-        }
-        .libre-font {
-          font-family: 'Libre Baskerville', serif;
         }
       `}</style>
 
@@ -305,7 +309,7 @@ export default function Home() {
                 border: '1px solid rgba(78, 205, 196, 0.1)',
                 fontFamily: "'Libre Baskerville', serif"
               }}>
-                📖 {jadwal?.pekan?.toUpperCase() || 'PEKAN'}
+                📖 {formatPekan(jadwal?.pekan)}
               </span>
               <span className="badge-pekan" style={{
                 padding: '4px 14px',
