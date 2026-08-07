@@ -6,6 +6,7 @@ export default function Home() {
   const [jadwal, setJadwal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState('');
+  const [greetingEmoji, setGreetingEmoji] = useState('');
   const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
@@ -23,11 +24,28 @@ export default function Home() {
     };
 
     const hour = new Date().getHours();
-    if (hour < 5) setGreeting('Selamat Malam');
-    else if (hour < 12) setGreeting('Selamat Pagi');
-    else if (hour < 15) setGreeting('Selamat Siang');
-    else if (hour < 19) setGreeting('Selamat Sore');
-    else setGreeting('Selamat Malam');
+    let greetText = '';
+    let emoji = '';
+
+    if (hour < 5) {
+      greetText = 'Selamat Malam';
+      emoji = '🌙';
+    } else if (hour < 12) {
+      greetText = 'Selamat Pagi';
+      emoji = '☀️';
+    } else if (hour < 15) {
+      greetText = 'Selamat Siang';
+      emoji = '☀️';
+    } else if (hour < 19) {
+      greetText = 'Selamat Sore';
+      emoji = '🌅';
+    } else {
+      greetText = 'Selamat Malam';
+      emoji = '🌙';
+    }
+
+    setGreeting(greetText);
+    setGreetingEmoji(emoji);
 
     updateTime();
     const interval = setInterval(updateTime, 60000);
@@ -105,13 +123,18 @@ export default function Home() {
           from { opacity: 0; transform: translateY(30px) scale(0.96); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
         @keyframes pulse {
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.05); }
+        }
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.1; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes bubbleFloat {
+          0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0.2; }
+          50% { opacity: 0.1; transform: translateY(-55vh) scale(1.1) rotate(10deg); }
+          100% { transform: translateY(-110vh) scale(1.3) rotate(-5deg); opacity: 0; }
         }
         .card {
           animation: fadeSlideUp 0.7s ease-out forwards;
@@ -127,18 +150,14 @@ export default function Home() {
         .badge-pekan {
           animation: pulse 2s ease-in-out infinite;
         }
-        .grid-number {
-          display: inline-block;
-          animation: float 3s ease-in-out infinite;
-        }
         .greeting-glow {
           color: #ffffff;
           text-shadow: 
-            0 0 20px rgba(78, 205, 196, 0.3),
-            0 0 40px rgba(78, 205, 196, 0.1),
-            0 0 80px rgba(69, 183, 209, 0.05);
+            0 0 20px rgba(78, 205, 196, 0.5),
+            0 0 40px rgba(78, 205, 196, 0.2),
+            0 0 80px rgba(69, 183, 209, 0.1);
           font-weight: 700;
-          letter-spacing: -0.5px;
+          letter-spacing: -0.3px;
         }
       `}</style>
 
@@ -189,12 +208,6 @@ export default function Home() {
               }}></div>
             );
           })}
-          <style>{`
-            @keyframes twinkle {
-              0%, 100% { opacity: 0.1; transform: scale(0.8); }
-              50% { opacity: 1; transform: scale(1.3); }
-            }
-          `}</style>
         </div>
 
         {/* ===== BUBBLE ===== */}
@@ -229,13 +242,6 @@ export default function Home() {
               }}></div>
             );
           })}
-          <style>{`
-            @keyframes bubbleFloat {
-              0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0.2; }
-              50% { opacity: 0.1; transform: translateY(-55vh) scale(1.1) rotate(10deg); }
-              100% { transform: translateY(-110vh) scale(1.3) rotate(-5deg); opacity: 0; }
-            }
-          `}</style>
         </div>
 
         {/* ===== CARD ===== */}
@@ -260,13 +266,13 @@ export default function Home() {
             borderBottom: '1px solid rgba(255,255,255,0.04)'
           }}>
             <h1 style={{
-              fontSize: '24px',
+              fontSize: '26px',
               fontWeight: '700',
               margin: 0,
               fontFamily: "'Inter', sans-serif",
               letterSpacing: '-0.3px'
             }}>
-              <span className="greeting-glow">{greeting}</span> 👋
+              <span className="greeting-glow">{greeting}</span> {greetingEmoji}
             </h1>
             <p style={{
               fontSize: '12px',
@@ -311,7 +317,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ===== GRID INFO (DIPERBAIKI) ===== */}
+          {/* ===== GRID INFO (ANIMASI DIHAPUS!) ===== */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -326,7 +332,7 @@ export default function Home() {
               textAlign: 'center'
             }}>
               <div style={{ fontSize: '18px', marginBottom: '2px' }}>📚</div>
-              <div className="grid-number" style={{
+              <div style={{
                 fontSize: '24px',
                 fontWeight: '700',
                 color: '#FFFFFF',
@@ -354,7 +360,7 @@ export default function Home() {
               textAlign: 'center'
             }}>
               <div style={{ fontSize: '18px', marginBottom: '2px' }}>{isLibur ? '🎉' : '📖'}</div>
-              <div className="grid-number" style={{
+              <div style={{
                 fontSize: '24px',
                 fontWeight: '700',
                 color: '#FFFFFF',
@@ -410,7 +416,7 @@ export default function Home() {
               borderRadius: '16px',
               border: '1px solid rgba(255,255,255,0.03)'
             }}>
-              <span style={{ fontSize: '48px', display: 'inline-block', animation: 'float 3s ease-in-out infinite' }}>🎉</span>
+              <span style={{ fontSize: '48px' }}>🎉</span>
               <h3 style={{
                 color: '#FFFFFF',
                 fontSize: '18px',
@@ -542,7 +548,7 @@ export default function Home() {
               fontWeight: '400',
               letterSpacing: '0.3px'
             }}>
-              ✨ v2.6
+              ✨ v2.8
             </span>
           </div>
         </div>
