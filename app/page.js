@@ -66,18 +66,25 @@ export default function Home() {
     '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
   ];
 
+  // ===== LOADING FULLSCREEN (FIX) =====
   if (loading) {
     return (
       <div style={{
-        height: '100vh',
-        width: '100vw',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '100%',
         background: 'linear-gradient(135deg, #0a0a1a, #1a1a3e, #0f3460)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         fontFamily: "'Libre Baskerville', serif",
         margin: 0,
-        padding: 0
+        padding: 0,
+        zIndex: 9999
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{
@@ -124,6 +131,11 @@ export default function Home() {
           margin: 0;
           padding: 0;
           overflow-x: hidden;
+          background: #0a0a1a;
+        }
+        html {
+          margin: 0;
+          padding: 0;
         }
         @keyframes fadeSlideUp {
           from { opacity: 0; transform: translateY(30px) scale(0.96); }
@@ -169,7 +181,7 @@ export default function Home() {
 
       <div style={{
         minHeight: '100vh',
-        width: '100vw',
+        width: '100%',
         background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f3460 100%)',
         padding: '16px',
         display: 'flex',
@@ -326,7 +338,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* GRID INFO (DIPERKECIL) */}
+          {/* GRID INFO */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
