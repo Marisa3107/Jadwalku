@@ -1,5 +1,5 @@
 {
-  "pekan1": {
+  "pekan_1": {
     "senin": ["B.DAERAH 3x", "PAI 3x", "SEJARAH 3x"],
     "selasa": ["MATEMATIKA 2x", "PPKN 2x", "PAI 2x", "B.INDONESIA 3x"],
     "rabu": ["PRODUKTIF 3x", "B.INDONESIA 3x", "B.INGGRIS 2x", "PPKN 2x"],
@@ -8,7 +8,7 @@
     "sabtu": [],
     "minggu": []
   },
-  "pekan2": {
+  "pekan_2": {
     "senin": ["PRODUKTIF 9x (FULL)"],
     "selasa": ["PAI 3x", "PRODUKTIF 7x"],
     "rabu": ["B.INGGRIS 3x", "PJOK 2x", "PKWU 5x"],
@@ -17,7 +17,7 @@
     "sabtu": [],
     "minggu": []
   },
-  "pekan3": {
+  "pekan_3": {
     "senin": ["PKWU 3x", "MATEMATIKA 2x", "B.INGGRIS 2x", "PRODUKTIF 2x"],
     "selasa": ["PRODUKTIF 2x", "B.INGGRIS 3x", "PJOK 2x", "PRODUKTIF 3x"],
     "rabu": ["PKWU 3x", "PRODUKTIF 4x", "B.DAERAH 3x"],
