@@ -96,7 +96,7 @@ export default function Home() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* ===== BUBBLE ANIMASI (kayak referensi) ===== */}
+      {/* ===== BUBBLE ANIMASI (BANYAK & JELAS!) ===== */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -107,54 +107,72 @@ export default function Home() {
         pointerEvents: 'none',
         zIndex: 0
       }}>
-        {[...Array(12)].map((_, i) => {
-          const size = 40 + Math.random() * 120;
+        {[...Array(20)].map((_, i) => {
+          const size = 50 + Math.random() * 180;
           const left = Math.random() * 100;
-          const delay = Math.random() * 10;
-          const duration = 15 + Math.random() * 20;
+          const delay = Math.random() * 12;
+          const duration = 18 + Math.random() * 25;
+          const colors = [
+            'rgba(78, 205, 196, 0.25)',
+            'rgba(69, 183, 209, 0.2)',
+            'rgba(255, 107, 107, 0.2)',
+            'rgba(255, 234, 167, 0.25)',
+            'rgba(187, 143, 206, 0.2)',
+            'rgba(150, 206, 180, 0.2)',
+          ];
           return (
             <div key={i} style={{
               position: 'absolute',
-              bottom: '-100px',
+              bottom: '-150px',
               left: left + '%',
               width: size + 'px',
               height: size + 'px',
               borderRadius: '50%',
-              background: `radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)`,
-              animation: `bubbleUp ${duration}s ease-in infinite`,
+              background: `radial-gradient(circle, ${colors[i % colors.length]} 0%, rgba(255,255,255,0) 80%)`,
+              animation: `bubbleUp ${duration}s ease-in-out infinite`,
               animationDelay: delay + 's',
-              opacity: 0.3 + Math.random() * 0.4,
+              opacity: 0.5 + Math.random() * 0.5,
+              transform: `scale(${0.8 + Math.random() * 0.6})`,
             }}></div>
           );
         })}
         <style>{`
           @keyframes bubbleUp {
-            0% { transform: translateY(0) scale(0.8); opacity: 0.6; }
-            50% { opacity: 0.4; }
-            100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+            0% { 
+              transform: translateY(0) scale(0.6) rotate(0deg); 
+              opacity: 0.7; 
+            }
+            50% { 
+              opacity: 0.4; 
+              transform: translateY(-55vh) scale(1) rotate(10deg); 
+            }
+            100% { 
+              transform: translateY(-110vh) scale(1.3) rotate(-5deg); 
+              opacity: 0; 
+            }
           }
         `}</style>
       </div>
 
-      {/* ===== CARD UTAMA (Glassmorphism) ===== */}
+      {/* ===== CARD UTAMA ===== */}
       <div style={{
         width: '100%',
         maxWidth: '480px',
         position: 'relative',
         zIndex: 1,
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        backgroundColor: 'rgba(255,255,255,0.75)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
         borderRadius: '32px',
         padding: '28px 24px',
-        boxShadow: '0 30px 80px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
-        border: '1px solid rgba(255,255,255,0.4)',
+        boxShadow: '0 30px 80px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+        border: '1px solid rgba(255,255,255,0.5)',
         animation: 'fadeUp 0.8s ease-out'
       }}>
         <style>{`
           @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
           }
         `}</style>
 
@@ -166,13 +184,16 @@ export default function Home() {
           borderBottom: '1px solid rgba(0,0,0,0.05)'
         }}>
           <h1 style={{
-            fontSize: '24px',
+            fontSize: '26px',
             fontWeight: '700',
             margin: 0,
             color: '#1a1a2e',
-            letterSpacing: '-0.5px'
+            letterSpacing: '-0.5px',
+            background: 'linear-gradient(135deg, #1a1a2e 0%, #4ECDC4 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
           }}>
-            📚 {greeting} 👋
+            {greeting} 👋
           </h1>
           <p style={{
             fontSize: '13px',
@@ -190,19 +211,20 @@ export default function Home() {
             flexWrap: 'wrap'
           }}>
             <span style={{
-              padding: '4px 16px',
+              padding: '5px 18px',
               background: 'linear-gradient(135deg, #4ECDC4, #44B39D)',
               borderRadius: '50px',
               fontSize: '12px',
               fontWeight: '600',
               color: '#fff',
-              letterSpacing: '0.3px'
+              letterSpacing: '0.3px',
+              boxShadow: '0 4px 16px rgba(78,205,196,0.3)'
             }}>
               📖 {jadwal?.pekan?.toUpperCase() || 'PEKAN'}
             </span>
             <span style={{
-              padding: '4px 16px',
-              background: 'rgba(0,0,0,0.05)',
+              padding: '5px 18px',
+              background: 'rgba(0,0,0,0.06)',
               borderRadius: '50px',
               fontSize: '12px',
               fontWeight: '500',
@@ -213,7 +235,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ===== GRID INFO (kayak streak, target di referensi) ===== */}
+        {/* ===== GRID INFO ===== */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
@@ -221,43 +243,45 @@ export default function Home() {
           marginBottom: '20px'
         }}>
           <div style={{
-            background: 'rgba(255,255,255,0.5)',
-            borderRadius: '14px',
-            padding: '12px 14px',
-            border: '1px solid rgba(255,255,255,0.6)',
-            textAlign: 'center'
+            background: 'rgba(255,255,255,0.6)',
+            borderRadius: '16px',
+            padding: '14px 12px',
+            border: '1px solid rgba(255,255,255,0.8)',
+            textAlign: 'center',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
           }}>
-            <div style={{ fontSize: '22px' }}>📚</div>
-            <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a2e' }}>
+            <div style={{ fontSize: '24px' }}>📚</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#1a1a2e' }}>
               {totalMapel}
             </div>
-            <div style={{ fontSize: '10px', color: '#6c6c8a' }}>Mata Pelajaran</div>
+            <div style={{ fontSize: '11px', color: '#6c6c8a', fontWeight: '500' }}>Mata Pelajaran</div>
           </div>
           <div style={{
-            background: 'rgba(255,255,255,0.5)',
-            borderRadius: '14px',
-            padding: '12px 14px',
-            border: '1px solid rgba(255,255,255,0.6)',
-            textAlign: 'center'
+            background: 'rgba(255,255,255,0.6)',
+            borderRadius: '16px',
+            padding: '14px 12px',
+            border: '1px solid rgba(255,255,255,0.8)',
+            textAlign: 'center',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
           }}>
-            <div style={{ fontSize: '22px' }}>⏰</div>
-            <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a2e' }}>
+            <div style={{ fontSize: '24px' }}>{isLibur ? '🎉' : '📖'}</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#1a1a2e' }}>
               {isLibur ? 'Libur' : 'Sekolah'}
             </div>
-            <div style={{ fontSize: '10px', color: '#6c6c8a' }}>Status Hari</div>
+            <div style={{ fontSize: '11px', color: '#6c6c8a', fontWeight: '500' }}>Status Hari</div>
           </div>
         </div>
 
         {/* ===== DAFTAR PELAJARAN ===== */}
         {isLibur ? (
           <div style={{
-            padding: '32px 20px',
+            padding: '36px 20px',
             textAlign: 'center',
             background: 'rgba(255,255,255,0.4)',
             borderRadius: '20px',
             border: '1px solid rgba(255,255,255,0.3)'
           }}>
-            <span style={{ fontSize: '56px' }}>🎉</span>
+            <span style={{ fontSize: '60px' }}>🎉</span>
             <h3 style={{
               color: '#1a1a2e',
               fontSize: '20px',
@@ -283,18 +307,19 @@ export default function Home() {
                 <div key={index} style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '12px 16px',
+                  padding: '13px 16px',
                   marginBottom: '8px',
                   background: 'rgba(255,255,255,0.5)',
                   borderRadius: '14px',
-                  borderLeft: `4px solid ${color}`,
-                  transition: 'all 0.2s ease'
+                  borderLeft: `5px solid ${color}`,
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
                 }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     background: color,
-                    borderRadius: '10px',
+                    borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -316,8 +341,8 @@ export default function Home() {
                     {mapel}
                   </span>
                   <span style={{
-                    fontSize: '18px',
-                    opacity: 0.4
+                    fontSize: '20px',
+                    opacity: 0.3
                   }}>
                     {['📐','🔬','📖','✏️','🧮','🎨','🏃','💻','📝','🌍'][index % 10]}
                   </span>
@@ -340,7 +365,7 @@ export default function Home() {
         }}>
           <span style={{
             fontSize: '11px',
-            color: 'rgba(0,0,0,0.3)',
+            color: 'rgba(0,0,0,0.25)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px'
@@ -355,7 +380,7 @@ export default function Home() {
           }}></span>
           <span style={{
             fontSize: '11px',
-            color: 'rgba(0,0,0,0.3)',
+            color: 'rgba(0,0,0,0.25)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px'
@@ -370,12 +395,12 @@ export default function Home() {
           }}></span>
           <span style={{
             fontSize: '11px',
-            color: 'rgba(0,0,0,0.2)',
+            color: 'rgba(0,0,0,0.15)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px'
           }}>
-            ✨ v2.0
+            ✨ v2.1
           </span>
         </div>
       </div>
