@@ -105,7 +105,6 @@ export default function Home() {
   const totalMapel = jadwal?.jadwal?.length || 0;
   const hari = jadwal?.hari?.charAt(0).toUpperCase() + jadwal?.hari?.slice(1) || '';
 
-  // Format pekan: "pekan1" → "PEKAN 1"
   const formatPekan = (pekan) => {
     if (!pekan) return 'PEKAN';
     const number = pekan.replace('pekan', '');
@@ -182,7 +181,7 @@ export default function Home() {
         margin: 0,
         boxSizing: 'border-box'
       }}>
-        {/* ===== BINTANG ===== */}
+        {/* BINTANG */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -217,7 +216,7 @@ export default function Home() {
           })}
         </div>
 
-        {/* ===== BUBBLE ===== */}
+        {/* BUBBLE */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -251,7 +250,7 @@ export default function Home() {
           })}
         </div>
 
-        {/* ===== CARD ===== */}
+        {/* CARD */}
         <div className="card" style={{
           width: '100%',
           maxWidth: '420px',
@@ -265,7 +264,7 @@ export default function Home() {
           boxShadow: '0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.05)',
         }}>
-          {/* ===== HEADER ===== */}
+          {/* HEADER */}
           <div style={{
             textAlign: 'center',
             marginBottom: '20px',
@@ -327,7 +326,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ===== GRID INFO ===== */}
+          {/* GRID INFO (DIPERKECIL) */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -341,9 +340,9 @@ export default function Home() {
               border: '1px solid rgba(255,255,255,0.04)',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>📚</div>
+              <div style={{ fontSize: '16px', marginBottom: '2px' }}>📚</div>
               <div style={{
-                fontSize: '24px',
+                fontSize: '20px',
                 fontWeight: '700',
                 color: '#FFFFFF',
                 letterSpacing: '-0.3px',
@@ -353,7 +352,7 @@ export default function Home() {
                 {totalMapel}
               </div>
               <div style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 color: 'rgba(255,255,255,0.3)',
                 fontWeight: '500',
                 letterSpacing: '0.5px',
@@ -371,9 +370,9 @@ export default function Home() {
               border: '1px solid rgba(255,255,255,0.04)',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{isLibur ? '🎉' : '📖'}</div>
+              <div style={{ fontSize: '16px', marginBottom: '2px' }}>{isLibur ? '🎉' : '📖'}</div>
               <div style={{
-                fontSize: '24px',
+                fontSize: '20px',
                 fontWeight: '700',
                 color: '#FFFFFF',
                 letterSpacing: '-0.3px',
@@ -383,7 +382,7 @@ export default function Home() {
                 {isLibur ? 'Libur' : 'Sekolah'}
               </div>
               <div style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 color: 'rgba(255,255,255,0.3)',
                 fontWeight: '500',
                 letterSpacing: '0.5px',
@@ -396,7 +395,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ===== DAFTAR PELAJARAN ===== */}
+          {/* DAFTAR PELAJARAN */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -513,7 +512,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* ===== FOOTER ===== */}
+          {/* FOOTER */}
           <div style={{
             marginTop: '18px',
             paddingTop: '14px',
