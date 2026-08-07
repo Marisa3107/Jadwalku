@@ -75,7 +75,7 @@ export default function Home() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        fontFamily: "'Inter', -apple-system, sans-serif",
+        fontFamily: "'Libre Baskerville', serif",
         margin: 0,
         padding: 0
       }}>
@@ -108,7 +108,7 @@ export default function Home() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
         * {
           margin: 0;
           padding: 0;
@@ -159,6 +159,9 @@ export default function Home() {
           font-weight: 700;
           letter-spacing: -0.3px;
         }
+        .libre-font {
+          font-family: 'Libre Baskerville', serif;
+        }
       `}</style>
 
       <div style={{
@@ -169,13 +172,13 @@ export default function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Libre Baskerville', serif",
         position: 'relative',
         overflow: 'hidden',
         margin: 0,
         boxSizing: 'border-box'
       }}>
-        {/* ===== BINTANG MELAYANG ===== */}
+        {/* ===== BINTANG ===== */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -269,7 +272,7 @@ export default function Home() {
               fontSize: '26px',
               fontWeight: '700',
               margin: 0,
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Libre Baskerville', serif",
               letterSpacing: '-0.3px'
             }}>
               <span className="greeting-glow">{greeting}</span> {greetingEmoji}
@@ -279,7 +282,8 @@ export default function Home() {
               color: 'rgba(255,255,255,0.3)',
               marginTop: '4px',
               fontWeight: '400',
-              letterSpacing: '0.2px'
+              letterSpacing: '0.2px',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
               {currentTime}
             </p>
@@ -298,7 +302,8 @@ export default function Home() {
                 fontWeight: '600',
                 color: '#4ECDC4',
                 letterSpacing: '0.3px',
-                border: '1px solid rgba(78, 205, 196, 0.1)'
+                border: '1px solid rgba(78, 205, 196, 0.1)',
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 📖 {jadwal?.pekan?.toUpperCase() || 'PEKAN'}
               </span>
@@ -310,14 +315,15 @@ export default function Home() {
                 fontWeight: '600',
                 color: '#45B7D1',
                 letterSpacing: '0.3px',
-                border: '1px solid rgba(69, 183, 209, 0.1)'
+                border: '1px solid rgba(69, 183, 209, 0.1)',
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 📅 {hari}
               </span>
             </div>
           </div>
 
-          {/* ===== GRID INFO (ANIMASI DIHAPUS!) ===== */}
+          {/* ===== GRID INFO ===== */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -337,7 +343,8 @@ export default function Home() {
                 fontWeight: '700',
                 color: '#FFFFFF',
                 letterSpacing: '-0.3px',
-                lineHeight: 1.2
+                lineHeight: 1.2,
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 {totalMapel}
               </div>
@@ -347,7 +354,8 @@ export default function Home() {
                 fontWeight: '500',
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase',
-                marginTop: '2px'
+                marginTop: '2px',
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 Mata Pelajaran
               </div>
@@ -365,7 +373,8 @@ export default function Home() {
                 fontWeight: '700',
                 color: '#FFFFFF',
                 letterSpacing: '-0.3px',
-                lineHeight: 1.2
+                lineHeight: 1.2,
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 {isLibur ? 'Libur' : 'Sekolah'}
               </div>
@@ -375,7 +384,8 @@ export default function Home() {
                 fontWeight: '500',
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase',
-                marginTop: '2px'
+                marginTop: '2px',
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 Status Hari
               </div>
@@ -395,14 +405,16 @@ export default function Home() {
               fontWeight: '600',
               color: 'rgba(255,255,255,0.25)',
               letterSpacing: '0.5px',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
               📋 Daftar Pelajaran
             </span>
             <span style={{
               fontSize: '10px',
               color: 'rgba(255,255,255,0.15)',
-              fontWeight: '400'
+              fontWeight: '400',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
               {totalMapel} mapel
             </span>
@@ -422,7 +434,7 @@ export default function Home() {
                 fontSize: '18px',
                 margin: '8px 0 4px',
                 fontWeight: '600',
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "'Libre Baskerville', serif",
                 letterSpacing: '-0.2px'
               }}>
                 Libur!
@@ -430,7 +442,8 @@ export default function Home() {
               <p style={{
                 color: 'rgba(255,255,255,0.2)',
                 margin: 0,
-                fontSize: '12px'
+                fontSize: '12px',
+                fontFamily: "'Libre Baskerville', serif"
               }}>
                 Tidak ada jadwal hari ini. Istirahat dulu! ✨
               </p>
@@ -469,6 +482,7 @@ export default function Home() {
                       marginRight: '12px',
                       flexShrink: 0,
                       boxShadow: `0 2px 12px ${color}20`,
+                      fontFamily: "'Libre Baskerville', serif"
                     }}>
                       {jam}
                     </div>
@@ -478,7 +492,8 @@ export default function Home() {
                       color: '#FFFFFF',
                       flex: 1,
                       textShadow: '0 1px 8px rgba(0,0,0,0.1)',
-                      letterSpacing: '-0.1px'
+                      letterSpacing: '-0.1px',
+                      fontFamily: "'Libre Baskerville', serif"
                     }}>
                       {mapel}
                     </span>
@@ -512,7 +527,8 @@ export default function Home() {
               alignItems: 'center',
               gap: '4px',
               fontWeight: '400',
-              letterSpacing: '0.3px'
+              letterSpacing: '0.3px',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
               ⏰ 05:20
             </span>
@@ -529,7 +545,8 @@ export default function Home() {
               alignItems: 'center',
               gap: '4px',
               fontWeight: '400',
-              letterSpacing: '0.3px'
+              letterSpacing: '0.3px',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
               🤖 Telegram
             </span>
@@ -546,9 +563,10 @@ export default function Home() {
               alignItems: 'center',
               gap: '4px',
               fontWeight: '400',
-              letterSpacing: '0.3px'
+              letterSpacing: '0.3px',
+              fontFamily: "'Libre Baskerville', serif"
             }}>
-              ✨ v2.8
+              ✨ v2.9
             </span>
           </div>
         </div>
