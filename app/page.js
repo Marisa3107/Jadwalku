@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Home() {
   const [jadwal, setJadwal] = useState(null);
@@ -8,6 +8,8 @@ export default function Home() {
   const [greeting, setGreeting] = useState('');
   const [greetingEmoji, setGreetingEmoji] = useState('');
   const [currentTime, setCurrentTime] = useState('');
+  const [countDisplay, setCountDisplay] = useState(0);
+  const countedRef = useRef(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -61,21 +63,49 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  const totalMapel = jadwal?.jadwal?.length || 0;
+
+  // Animasi hitung naik untuk angka jumlah mata pelajaran, sekali saja saat data siap
+  useEffect(() => {
+    if (loading || countedRef.current) return;
+    countedRef.current = true;
+
+    if (totalMapel === 0) {
+      setCountDisplay(0);
+      return;
+    }
+
+    const duration = 600;
+    const steps = Math.min(totalMapel, 12);
+    const stepTime = Math.max(duration / steps, 30);
+    let current = 0;
+
+    const tick = setInterval(() => {
+      current += 1;
+      setCountDisplay(Math.min(current, totalMapel));
+      if (current >= totalMapel) clearInterval(tick);
+    }, stepTime);
+
+    return () => clearInterval(tick);
+  }, [loading, totalMapel]);
+
+  // Aksen kuningan bertingkat gelap→terang untuk tiap baris pelajaran
   const colors = [
-    '#8B5CF6', '#06B6D4', '#3B82F6', '#10B981', '#F59E0B',
-    '#EC4899', '#14B8A6', '#F97316', '#A855F7', '#22C55E',
+    '#C9A227', '#B8863B', '#9C8A4E', '#A8762F', '#8E9B6E',
+    '#B08D57', '#6E8B7A', '#BF7E3F', '#7A8FA6', '#AD9642',
   ];
 
   if (loading) {
     return (
       <>
         <style>{styles}</style>
-        <div className="ui-shell">
-          <div className="orb orb-one" />
-          <div className="orb orb-two" />
-          <div className="loading-wrap">
-            <div className="loader-ring"></div>
-            <p>Menyiapkan jadwal...</p>
+        <div className="journal-shell">
+          <div className="journal-page loading-page">
+            <div className="loader-seal">
+              <span className="loader-ring" />
+              <span className="loader-ring loader-ring-2" />
+            </div>
+            <p>Menyusun jadwal...</p>
           </div>
         </div>
       </>
@@ -83,7 +113,6 @@ export default function Home() {
   }
 
   const isLibur = !jadwal?.jadwal || jadwal.jadwal.length === 0;
-  const totalMapel = jadwal?.jadwal?.length || 0;
   const hari = jadwal?.hari?.charAt(0).toUpperCase() + jadwal?.hari?.slice(1) || '';
 
   const formatPekan = (pekan) => {
@@ -96,128 +125,116 @@ export default function Home() {
     <>
       <style>{styles}</style>
 
-      <div className="ui-shell">
-        <div className="orb orb-one" />
-        <div className="orb orb-two" />
-        <div className="orb orb-three" />
-        <div className="grid-overlay" />
-        <div className="stars-layer">
-          {[...Array(18)].map((_, index) => (
-            <span
-              key={`star-big-${index}`}
-              className="star star-big"
-              style={{
-                left: `${(index * 17 + 9) % 100}%`,
-                top: `${(index * 11 + 7) % 100}%`,
-                animationDelay: `${index * 0.6}s`,
-                animationDuration: `${5 + (index % 4)}s`,
-              }}
-            />
-          ))}
-          {[...Array(28)].map((_, index) => (
-            <span
-              key={`star-small-${index}`}
-              className="star star-small"
-              style={{
-                left: `${(index * 9 + 13) % 100}%`,
-                top: `${(index * 13 + 3) % 100}%`,
-                animationDelay: `${index * 0.35}s`,
-                animationDuration: `${6 + (index % 5)}s`,
-              }}
-            />
-          ))}
-        </div>
+      <div className="journal-shell">
+        <div className="grain-overlay" />
+        {[...Array(9)].map((_, i) => (
+          <span
+            key={`mote-${i}`}
+            className="brass-mote"
+            style={{
+              left: `${(i * 24 + 5) % 100}%`,
+              top: `${(i * 19 + 8) % 100}%`,
+              animationDelay: `${i * 0.8}s`,
+              animationDuration: `${6 + (i % 4)}s`,
+            }}
+          />
+        ))}
 
-        <div className="modern-card">
-          <div className="top-row">
-            <div className="status-pill">
-              <span className="status-dot" />
-              Jadwal aktif
+        <div className="journal-page">
+          <span className="rivet rivet-tl" />
+          <span className="rivet rivet-tr" />
+          <span className="rivet rivet-bl" />
+          <span className="rivet rivet-br" />
+          <div className="elastic-band" aria-hidden="true" />
+
+          <div className="page-content">
+            <div className="top-row reveal" style={{ '--delay': '0.05s' }}>
+              <div className="seal-badge">
+                <span className="seal-dot" />
+                AKTIF
+              </div>
+              <div className="tag-chip">v2.9</div>
             </div>
-            <div className="mini-chip">v2.9</div>
-          </div>
 
-          <div className="header-block">
-            <h1 className="greeting-title">
-              {greeting} <span>{greetingEmoji}</span>
-            </h1>
-            <p className="time-text">{currentTime}</p>
+            <div className="header-block reveal" style={{ '--delay': '0.14s' }}>
+              <h1 className="greeting-title">
+                {greeting} <span className="greet-emoji">{greetingEmoji}</span>
+              </h1>
+              <p className="time-text">{currentTime}</p>
 
-            <div className="badge-row">
-              <span className="info-badge primary-badge">📖 {formatPekan(jadwal?.pekan)}</span>
-              <span className="info-badge secondary-badge">📅 {hari}</span>
-            </div>
-          </div>
-
-          <div className="stats-grid">
-            <div className="stat-box">
-              <div className="stat-icon">📚</div>
-              <div>
-                <div className="stat-value">{totalMapel}</div>
-                <div className="stat-label">Mata Pelajaran</div>
+              <div className="badge-row">
+                <span className="mil-tag reveal" style={{ '--delay': '0.22s' }}>
+                  📖 {formatPekan(jadwal?.pekan)}
+                </span>
+                <span className="mil-tag mil-tag-alt reveal" style={{ '--delay': '0.28s' }}>
+                  📅 {hari}
+                </span>
               </div>
             </div>
 
-            <div className="stat-box">
-              <div className="stat-icon">{isLibur ? '🎉' : '🏫'}</div>
-              <div>
+            <div className="stats-row reveal" style={{ '--delay': '0.34s' }}>
+              <div className="stat-block">
+                <div className="stat-value">{countDisplay}</div>
+                <div className="stat-label">Mata Pelajaran</div>
+              </div>
+              <div className="stat-block">
                 <div className="stat-value">{isLibur ? 'Libur' : 'Sekolah'}</div>
                 <div className="stat-label">Status Hari</div>
               </div>
             </div>
-          </div>
 
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Daftar pelajaran</p>
-              <h2 className="section-title">Jadwal hari ini</h2>
-            </div>
-            <span className="count-chip">{totalMapel} mapel</span>
-          </div>
+            <div className="hairline reveal" style={{ '--delay': '0.4s' }} />
 
-          {isLibur ? (
-            <div className="empty-card">
-              <div className="empty-emoji">🎉</div>
-              <h3>Libur!</h3>
-              <p>Tidak ada jadwal hari ini. Istirahat dulu!</p>
+            <div className="section-head reveal" style={{ '--delay': '0.44s' }}>
+              <div>
+                <p className="section-kicker">Daftar Pelajaran</p>
+                <h2 className="section-title">Jadwal Hari Ini</h2>
+              </div>
+              <span className="count-badge">{totalMapel}</span>
             </div>
-          ) : (
-            <div className="lesson-list">
-              {jadwal?.jadwal?.map((mapel, index) => {
-                const jam = 7 + index;
-                const color = colors[index % colors.length];
-                return (
-                  <div
-                    key={index}
-                    className="lesson-item"
-                    style={{
-                      '--accent': color,
-                      '--accent-soft': `${color}22`,
-                    }}
-                  >
-                    <div className="lesson-left">
-                      <div className="lesson-hour">{jam}</div>
-                      <div>
-                        <div className="lesson-name">{mapel}</div>
-                        <div className="lesson-subtitle">Sesi {index + 1}</div>
+
+            {isLibur ? (
+              <div className="empty-block reveal" style={{ '--delay': '0.5s' }}>
+                <div className="empty-icon">🎉</div>
+                <h3>Hari Ini Libur!</h3>
+                <p>Tidak ada jadwal. Manfaatkan waktumu sebaik mungkin.</p>
+              </div>
+            ) : (
+              <div className="entry-list">
+                {jadwal?.jadwal?.map((mapel, index) => {
+                  const jam = 7 + index;
+                  const color = colors[index % colors.length];
+                  const icon = ['📐', '🔬', '📖', '✏️', '🧮', '🎨', '🏃', '💻', '📝', '🌍'][index % 10];
+                  return (
+                    <div
+                      key={index}
+                      className="entry-item"
+                      style={{
+                        '--accent': color,
+                        '--delay': `${0.46 + index * 0.055}s`,
+                      }}
+                    >
+                      <div className="entry-left">
+                        <div className="hour-badge">{jam}</div>
+                        <div>
+                          <div className="mapel-name">{mapel}</div>
+                          <div className="mapel-sub">Sesi {index + 1}</div>
+                        </div>
                       </div>
+                      <div className="icon-slot">{icon}</div>
                     </div>
+                  );
+                })}
+              </div>
+            )}
 
-                    <div className="lesson-right">
-                      {['📐', '🔬', '📖', '✏️', '🧮', '🎨', '🏃', '💻', '📝', '🌍'][index % 10]}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="footer-note reveal" style={{ '--delay': '0.7s' }}>
+              <span>⏰ 05:30</span>
+              <span className="dot">—</span>
+              <span>🤖 Telegram</span>
+              <span className="dot">—</span>
+              <span>Vol. 01</span>
             </div>
-          )}
-
-          <div className="footer-row">
-            <span>⏰ 05:30</span>
-            <span className="divider-dot" />
-            <span>🤖 Telegram</span>
-            <span className="divider-dot" />
-            <span>✨ Modern UI</span>
           </div>
         </div>
       </div>
@@ -226,7 +243,20 @@ export default function Home() {
 }
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg-deep: #14110E;
+    --leather: #221C16;
+    --leather-2: #2A2219;
+    --stitch: rgba(201, 162, 39, 0.32);
+    --brass: #C9A227;
+    --brass-bright: #E7C567;
+    --ink: #F3ECDA;
+    --ink-soft: #A99E86;
+    --ink-mute: #8B8069;
+    --wine: #7A3B3B;
+  }
 
   * {
     box-sizing: border-box;
@@ -236,210 +266,232 @@ const styles = `
     margin: 0;
     padding: 0;
     background:
-      linear-gradient(160deg, #020617 0%, #0f172a 45%, #111827 100%);
-    color: #f8fafc;
+      radial-gradient(ellipse at 20% -10%, #2C241A 0%, transparent 55%),
+      linear-gradient(160deg, #0F0D0B 0%, #17130F 50%, #0F0D0B 100%);
+    color: var(--ink);
     overflow-x: hidden;
-    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
   }
 
-  .ui-shell {
+  .journal-shell {
     position: relative;
     min-height: 100vh;
-    padding: 18px;
+    padding: 28px 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
   }
 
-  .grid-overlay {
+  .grain-overlay {
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(circle at center, black 25%, transparent 85%);
-    opacity: 0.25;
+    background-image: radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.6;
     pointer-events: none;
   }
 
-  .stars-layer {
+  .brass-mote {
     position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .star {
-    position: absolute;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
-    animation-name: twinkleFloat;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-  }
-
-  .star::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(255,255,255,0.45), transparent 70%);
-    opacity: 0.65;
-  }
-
-  .star-big {
     width: 3px;
     height: 3px;
-  }
-
-  .star-small {
-    width: 2px;
-    height: 2px;
-    opacity: 0.75;
-  }
-
-  .orb {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(90px);
+    border-radius: 50%;
+    background: var(--brass-bright);
+    opacity: 0;
+    box-shadow: 0 0 6px rgba(231, 197, 103, 0.6);
+    animation: driftMote ease-in-out infinite;
     pointer-events: none;
-    opacity: 0.55;
   }
 
-  .orb-one {
-    width: 220px;
-    height: 220px;
-    background: rgba(139, 92, 246, 0.18);
-    top: 4%;
-    left: -60px;
-  }
-
-  .orb-two {
-    width: 260px;
-    height: 260px;
-    background: rgba(6, 182, 212, 0.14);
-    bottom: 4%;
-    right: -90px;
-  }
-
-  .orb-three {
-    width: 180px;
-    height: 180px;
-    background: rgba(236, 72, 153, 0.10);
-    top: 24%;
-    right: 16%;
-  }
-
-  .modern-card,
-  .loading-wrap {
+  .journal-page,
+  .loading-page {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 430px;
-    border-radius: 30px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.62));
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    max-width: 420px;
+    background:
+      linear-gradient(165deg, var(--leather-2), var(--leather) 60%);
+    border-radius: 14px;
+    border: 1px solid rgba(201, 162, 39, 0.16);
     box-shadow:
-      0 24px 80px rgba(2, 6, 23, 0.55),
-      inset 0 1px 0 rgba(255,255,255,0.06);
+      0 30px 70px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    animation: settleJournal 0.6s cubic-bezier(.22,.9,.35,1);
+    perspective: 900px;
   }
 
-  .modern-card {
-    padding: 22px;
-    animation: fadeUp 0.65s ease-out;
+  .journal-page::before {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border-radius: 8px;
+    border: 1px dashed var(--stitch);
+    pointer-events: none;
   }
 
-  .loading-wrap {
-    padding: 34px 24px;
+  .loading-page {
+    padding: 50px 24px 40px;
     text-align: center;
   }
 
-  .loader-ring {
-    width: 58px;
-    height: 58px;
-    border: 4px solid rgba(255,255,255,0.08);
-    border-top: 4px solid #38bdf8;
+  .rivet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    margin: 0 auto 18px;
-    animation: spin 1s linear infinite;
+    background: radial-gradient(circle at 35% 30%, var(--brass-bright), var(--brass) 55%, #7A611A 100%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    animation: rivetGleam 3.6s ease-in-out infinite;
   }
 
-  .loading-wrap p {
+  .rivet-tl { top: 16px; left: 16px; animation-delay: 0s; }
+  .rivet-tr { top: 16px; right: 16px; animation-delay: 0.5s; }
+  .rivet-bl { bottom: 16px; left: 16px; animation-delay: 1s; }
+  .rivet-br { bottom: 16px; right: 16px; animation-delay: 1.5s; }
+
+  .elastic-band {
+    position: absolute;
+    top: -8px;
+    right: 38px;
+    width: 22px;
+    height: 64px;
+    background: linear-gradient(180deg, #5C1F1F, #7A3B3B 45%, #5C1F1F);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+    border-radius: 3px;
+    transform-origin: top center;
+    animation: bandSettle 0.9s cubic-bezier(.34,1.56,.64,1) both;
+    animation-delay: 0.15s;
+  }
+
+  .elastic-band::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    width: 12px;
+    height: 12px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brass-bright), var(--brass) 60%, #7A611A);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .page-content {
+    padding: 30px 26px 24px;
+  }
+
+  .reveal {
+    opacity: 0;
+    animation: fadeSlideUp 0.55s ease-out both;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .loader-seal {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+
+  .loader-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(201, 162, 39, 0.2);
+    border-top-color: var(--brass-bright);
+    animation: spin 0.9s linear infinite;
+  }
+
+  .loader-ring-2 {
+    inset: 9px;
+    border-width: 2px;
+    border-top-color: transparent;
+    border-right-color: var(--brass-bright);
+    animation: spin 1.3s linear infinite reverse;
+    opacity: 0.6;
+  }
+
+  .loading-page p {
     margin: 0;
-    color: rgba(255,255,255,0.7);
-    font-size: 14px;
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    animation: pulseText 1.6s ease-in-out infinite;
   }
 
   .top-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
+    gap: 10px;
+    margin-bottom: 20px;
   }
 
-  .status-pill,
-  .mini-chip,
-  .info-badge,
-  .count-chip {
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-  }
-
-  .status-pill {
+  .seal-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
+    gap: 7px;
+    padding: 7px 13px;
+    border: 1px solid rgba(201, 162, 39, 0.4);
     border-radius: 999px;
-    font-size: 12px;
+    color: var(--brass-bright);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
     font-weight: 600;
-    color: #cbd5e1;
+    letter-spacing: 0.09em;
+    background: rgba(201, 162, 39, 0.07);
   }
 
-  .status-dot {
-    width: 8px;
-    height: 8px;
+  .seal-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #22c55e;
-    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12);
-    animation: pulse 1.8s infinite;
+    background: var(--brass-bright);
+    box-shadow: 0 0 8px rgba(231, 197, 103, 0.7);
+    animation: breathe 2s ease-in-out infinite;
   }
 
-  .mini-chip {
-    padding: 9px 12px;
-    border-radius: 14px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
+  .tag-chip {
+    padding: 6px 11px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
   }
 
   .header-block {
-    padding-bottom: 18px;
-    margin-bottom: 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.14);
   }
 
   .greeting-title {
     margin: 0;
-    font-size: clamp(28px, 7vw, 36px);
-    line-height: 1.06;
-    letter-spacing: -0.05em;
-    color: #ffffff;
-    text-shadow: none;
+    font-family: 'Fraunces', serif;
     font-weight: 800;
+    font-optical-sizing: auto;
+    font-size: clamp(30px, 8vw, 38px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .greet-emoji {
+    font-size: 26px;
+    display: inline-block;
+    animation: emojiSway 2.4s ease-in-out infinite;
+    transform-origin: 70% 70%;
   }
 
   .time-text {
-    margin: 8px 0 0;
-    color: rgba(226, 232, 240, 0.65);
-    font-size: 13px;
-    line-height: 1.5;
+    margin: 10px 0 0;
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
   }
 
   .badge-row {
@@ -449,69 +501,78 @@ const styles = `
     flex-wrap: wrap;
   }
 
-  .info-badge {
+  .mil-tag {
     display: inline-flex;
     align-items: center;
-    padding: 10px 14px;
-    border-radius: 999px;
+    padding: 9px 13px;
+    border-radius: 6px;
+    border: 1px solid rgba(201, 162, 39, 0.28);
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.12), rgba(201, 162, 39, 0.03));
     font-size: 12px;
-    font-weight: 700;
-    color: #e2e8f0;
+    font-weight: 600;
+    color: var(--ink);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
 
-  .primary-badge {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(59, 130, 246, 0.12));
+  .mil-tag:hover {
+    transform: translateY(-2px);
+    border-color: rgba(201, 162, 39, 0.55);
   }
 
-  .secondary-badge {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(16, 185, 129, 0.12));
+  .mil-tag-alt {
+    border-color: rgba(122, 59, 59, 0.4);
+    background: linear-gradient(135deg, rgba(122, 59, 59, 0.18), rgba(122, 59, 59, 0.04));
   }
 
-  .stats-grid {
+  .mil-tag-alt:hover {
+    border-color: rgba(122, 59, 59, 0.6);
+  }
+
+  .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 20px;
   }
 
-  .stat-box {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  .stat-block {
     padding: 16px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.025);
     transition: transform 0.25s ease, border-color 0.25s ease;
   }
 
-  .stat-box:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.14);
-  }
-
-  .stat-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    display: grid;
-    place-items: center;
-    font-size: 20px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.16), rgba(56, 189, 248, 0.16));
+  .stat-block:hover {
+    transform: translateY(-3px);
+    border-color: rgba(201, 162, 39, 0.3);
   }
 
   .stat-value {
-    font-size: 22px;
-    font-weight: 800;
-    color: #ffffff;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 25px;
     line-height: 1.1;
-    letter-spacing: -0.04em;
+    color: var(--brass-bright);
+    font-variant-numeric: tabular-nums;
   }
 
   .stat-label {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #94a3b8;
+    margin-top: 5px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .hairline {
+    height: 1px;
+    margin: 2px 0 20px;
+    background: linear-gradient(90deg, rgba(201,162,39,0.35), rgba(201,162,39,0.03));
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: growLine 0.7s ease-out both;
+    animation-delay: var(--delay, 0s);
   }
 
   .section-head {
@@ -523,211 +584,267 @@ const styles = `
   }
 
   .section-kicker {
-    margin: 0 0 4px;
-    font-size: 11px;
+    margin: 0 0 3px;
+    font-size: 10.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
   }
 
   .section-title {
     margin: 0;
-    font-size: 19px;
-    letter-spacing: -0.03em;
-    color: #ffffff;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 21px;
+    color: var(--ink);
   }
 
-  .count-chip {
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #cbd5e1;
-    white-space: nowrap;
-  }
-
-  .lesson-list {
+  .count-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(201, 162, 39, 0.4);
     display: grid;
-    gap: 10px;
+    place-items: center;
+    color: var(--brass-bright);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+    animation-delay: 0.5s;
   }
 
-  .lesson-item {
+  .entry-list {
+    display: grid;
+  }
+
+  .entry-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 14px;
-    border-radius: 22px;
-    background:
-      linear-gradient(90deg, var(--accent-soft), transparent 34%),
-      rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+    padding: 13px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.055);
+    opacity: 0;
+    animation: slideInEntry 0.45s ease-out both;
+    animation-delay: var(--delay, 0s);
+    transition: background 0.2s ease, transform 0.2s ease;
   }
 
-  .lesson-item:hover {
-    transform: translateY(-2px);
+  .entry-item:last-child {
+    border-bottom: none;
+  }
+
+  .entry-item:hover {
+    background: rgba(255,255,255,0.028);
+    transform: translateX(3px);
+  }
+
+  .entry-item:hover .icon-slot {
+    transform: rotate(-8deg) scale(1.08);
     border-color: var(--accent);
-    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.22);
   }
 
-  .lesson-left {
+  .entry-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
     min-width: 0;
   }
 
-  .lesson-hour {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
+  .hour-badge {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 9px;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, var(--accent), rgba(255,255,255,0.18));
-    color: #ffffff;
-    font-weight: 800;
-    flex-shrink: 0;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    color: #17130F;
+    background: linear-gradient(155deg, var(--accent), color-mix(in srgb, var(--accent) 65%, black));
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    position: relative;
+    overflow: hidden;
   }
 
-  .lesson-name {
-    color: #ffffff;
+  .hour-badge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.45) 45%, transparent 70%);
+    background-size: 220% 220%;
+    background-position: -120% -120%;
+    animation: sheen 4.5s ease-in-out infinite;
+  }
+
+  .mapel-name {
     font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.025em;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
     word-break: break-word;
   }
 
-  .lesson-subtitle {
-    margin-top: 4px;
-    color: #94a3b8;
-    font-size: 12px;
+  .mapel-sub {
+    margin-top: 3px;
+    font-size: 11.5px;
+    color: var(--ink-mute);
   }
 
-  .lesson-right {
+  .icon-slot {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
+    width: 32px;
+    height: 32px;
     display: grid;
     place-items: center;
-    font-size: 18px;
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.25s ease, border-color 0.25s ease;
   }
 
-  .empty-card {
-    padding: 28px 18px;
-    border-radius: 24px;
+  .empty-block {
+    padding: 32px 16px;
     text-align: center;
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.02);
   }
 
-  .empty-emoji {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 14px;
-    border-radius: 22px;
-    display: grid;
-    place-items: center;
-    font-size: 30px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(6, 182, 212, 0.18));
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: inline-block;
+    animation: bounceIcon 1.8s ease-in-out infinite;
   }
 
-  .empty-card h3 {
+  .empty-block h3 {
     margin: 0 0 8px;
-    font-size: 20px;
-    color: #ffffff;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 21px;
+    color: var(--ink);
   }
 
-  .empty-card p {
+  .empty-block p {
     margin: 0;
-    color: rgba(226, 232, 240, 0.68);
-    font-size: 14px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
     line-height: 1.6;
   }
 
-  .footer-row {
-    margin-top: 18px;
+  .footer-note {
+    margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.07);
+    border-top: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    color: #64748b;
-    font-size: 12px;
+    gap: 9px;
+    color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
   }
 
-  .divider-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 999px;
-    background: rgba(148, 163, 184, 0.35);
+  .dot {
+    opacity: 0.5;
+  }
+
+  @keyframes settleJournal {
+    from { opacity: 0; transform: translateY(18px) rotateX(4deg) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInEntry {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes growLine {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.5); }
+    70% { transform: scale(1.12); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.35); opacity: 0.7; }
+  }
+
+  @keyframes emojiSway {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+  }
+
+  @keyframes rivetGleam {
+    0%, 100% { box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+    50% { box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 0 8px rgba(231,197,103,0.7); }
+  }
+
+  @keyframes bandSettle {
+    0% { transform: rotate(-14deg) translateY(-6px); }
+    60% { transform: rotate(5deg) translateY(0); }
+    100% { transform: rotate(3deg) translateY(0); }
+  }
+
+  @keyframes sheen {
+    0% { background-position: -120% -120%; }
+    45%, 100% { background-position: 120% 120%; }
+  }
+
+  @keyframes driftMote {
+    0% { transform: translate3d(0,0,0); opacity: 0; }
+    15% { opacity: 0.8; }
+    50% { transform: translate3d(3px, -22px, 0); opacity: 0.5; }
+    85% { opacity: 0.3; }
+    100% { transform: translate3d(-2px, -40px, 0); opacity: 0; }
+  }
+
+  @keyframes bounceIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @keyframes pulseText {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
   }
 
   @keyframes spin {
-    to {
-      transform: rotate(360deg);
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
     }
   }
 
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.15);
-      opacity: 0.84;
-    }
-  }
-
-  @keyframes twinkleFloat {
-    0%, 100% {
-      transform: translate3d(0, 0, 0) scale(0.8);
-      opacity: 0.2;
-    }
-    25% {
-      transform: translate3d(6px, -10px, 0) scale(1);
-      opacity: 0.75;
-    }
-    50% {
-      transform: translate3d(-4px, -18px, 0) scale(1.25);
-      opacity: 1;
-    }
-    75% {
-      transform: translate3d(5px, -8px, 0) scale(0.95);
-      opacity: 0.55;
-    }
-  }
-
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(16px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @media (max-width: 520px) {
-    .modern-card {
-      padding: 18px;
-      border-radius: 26px;
+  @media (max-width: 420px) {
+    .page-content {
+      padding: 26px 20px 20px;
     }
 
-    .stats-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .lesson-item {
-      padding: 13px;
+    .elastic-band {
+      right: 30px;
     }
   }
 `;
