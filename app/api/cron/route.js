@@ -23,7 +23,6 @@ async function kirimTelegram(pesan) {
   const TOKEN = '8860261405:AAHjKOzyVXCglqHrpJm7Xb4he1mGkCqURlY';
   const CHAT_ID = '5698906519';
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -41,11 +40,20 @@ async function kirimTelegram(pesan) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const testMode = searchParams.get('test') === 'true';
+  
+  if (testMode) {
+    console.log('🧪 TEST MODE: Dipanggil manual!');
+    await kirimTelegram('🧪 Test cron job berhasil!');
+    return NextResponse.json({ message: 'Test berhasil! Cek Telegram' });
+  }
+
   try {
     const now = new Date();
-    const jamUTC = now.getUTCHours();
-    const menitUTC = now.getUTCMinutes();
+    const jam = now.getHours();
+    const menit = now.getMinutes();
 
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
@@ -69,28 +77,29 @@ export async function GET() {
       });
     }
 
-    // ✅ HANYA KIRIM JIKA JAM UTC = 01:15 (08:15 WIB)
-    if (jamUTC === 1 && menitUTC === 25) {
+    // ✅ HANYA JAM 08.00 WIB (01.00 UTC) YANG BISA KIRIM!
+    if (jam === 1 && menit === 35) {
       await kirimTelegram(pesan);
-      console.log('✅ Pesan dikirim jam 8.15 WIB!');
+      console.log('✅ Pesan dikirim jam 8.35 WIB!');
       return NextResponse.json({
         message: 'Pesan dikirim!',
         jadwal: jadwalHariIni,
-        pekan,
+        pekan: pekan,
         hari: hariIni,
         status: 'sent'
       });
     } else {
-      console.log(`⏰ Bukan jam 8.15 WIB (sekarang UTC ${jamUTC}:${menitUTC}), skip kirim`);
+      console.log(`⏰ Bukan jam 8.35 WIB (sekarang ${jam}:${menit}), skip kirim`);
       return NextResponse.json({
-        message: 'Bukan jam 8.15 WIB, pesan tidak dikirim',
-        currentTimeUTC: `${jamUTC}:${menitUTC}`,
+        message: 'Bukan jam 8.35 WIB, pesan tidak dikirim',
+        currentTime: `${jam}:${menit}`,
         status: 'skipped',
         jadwal: jadwalHariIni,
-        pekan,
+        pekan: pekan,
         hari: hariIni
       });
     }
+
   } catch (error) {
     console.error('❌ Error:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
