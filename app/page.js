@@ -226,6 +226,8 @@ export default function Home() {
 }
 
 const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
   * {
     box-sizing: border-box;
   }
@@ -234,11 +236,10 @@ const styles = `
     margin: 0;
     padding: 0;
     background:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.14), transparent 30%),
       linear-gradient(160deg, #020617 0%, #0f172a 45%, #111827 100%);
     color: #f8fafc;
     overflow-x: hidden;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .ui-shell {
@@ -311,7 +312,7 @@ const styles = `
   .orb-one {
     width: 220px;
     height: 220px;
-    background: rgba(139, 92, 246, 0.28);
+    background: rgba(139, 92, 246, 0.18);
     top: 4%;
     left: -60px;
   }
@@ -319,7 +320,7 @@ const styles = `
   .orb-two {
     width: 260px;
     height: 260px;
-    background: rgba(6, 182, 212, 0.22);
+    background: rgba(6, 182, 212, 0.14);
     bottom: 4%;
     right: -90px;
   }
@@ -327,7 +328,7 @@ const styles = `
   .orb-three {
     width: 180px;
     height: 180px;
-    background: rgba(236, 72, 153, 0.15);
+    background: rgba(236, 72, 153, 0.10);
     top: 24%;
     right: 16%;
   }
@@ -430,8 +431,8 @@ const styles = `
     line-height: 1.06;
     letter-spacing: -0.05em;
     color: #ffffff;
-    text-shadow: 0 8px 30px rgba(59, 130, 246, 0.18);
-    animation: softGlow 4.5s ease-in-out infinite;
+    text-shadow: none;
+    font-weight: 800;
   }
 
   .time-text {
@@ -593,8 +594,8 @@ const styles = `
   .lesson-name {
     color: #ffffff;
     font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.025em;
     word-break: break-word;
   }
 
@@ -701,17 +702,6 @@ const styles = `
     75% {
       transform: translate3d(5px, -8px, 0) scale(0.95);
       opacity: 0.55;
-    }
-  }
-
-  @keyframes softGlow {
-    0%, 100% {
-      text-shadow: 0 8px 30px rgba(59, 130, 246, 0.18);
-    }
-    50% {
-      text-shadow:
-        0 10px 36px rgba(56, 189, 248, 0.24),
-        0 0 18px rgba(139, 92, 246, 0.16);
     }
   }
 
