@@ -101,6 +101,32 @@ export default function Home() {
         <div className="orb orb-two" />
         <div className="orb orb-three" />
         <div className="grid-overlay" />
+        <div className="stars-layer">
+          {[...Array(18)].map((_, index) => (
+            <span
+              key={`star-big-${index}`}
+              className="star star-big"
+              style={{
+                left: `${(index * 17 + 9) % 100}%`,
+                top: `${(index * 11 + 7) % 100}%`,
+                animationDelay: `${index * 0.6}s`,
+                animationDuration: `${5 + (index % 4)}s`,
+              }}
+            />
+          ))}
+          {[...Array(28)].map((_, index) => (
+            <span
+              key={`star-small-${index}`}
+              className="star star-small"
+              style={{
+                left: `${(index * 9 + 13) % 100}%`,
+                top: `${(index * 13 + 3) % 100}%`,
+                animationDelay: `${index * 0.35}s`,
+                animationDuration: `${6 + (index % 5)}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <div className="modern-card">
           <div className="top-row">
@@ -187,7 +213,7 @@ export default function Home() {
           )}
 
           <div className="footer-row">
-            <span>⏰ 05:20</span>
+            <span>⏰ 05:30</span>
             <span className="divider-dot" />
             <span>🤖 Telegram</span>
             <span className="divider-dot" />
@@ -235,6 +261,43 @@ const styles = `
     mask-image: radial-gradient(circle at center, black 25%, transparent 85%);
     opacity: 0.25;
     pointer-events: none;
+  }
+
+  .stars-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+    animation-name: twinkleFloat;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .star::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255,255,255,0.45), transparent 70%);
+    opacity: 0.65;
+  }
+
+  .star-big {
+    width: 3px;
+    height: 3px;
+  }
+
+  .star-small {
+    width: 2px;
+    height: 2px;
+    opacity: 0.75;
   }
 
   .orb {
@@ -368,6 +431,7 @@ const styles = `
     letter-spacing: -0.05em;
     color: #ffffff;
     text-shadow: 0 8px 30px rgba(59, 130, 246, 0.18);
+    animation: softGlow 4.5s ease-in-out infinite;
   }
 
   .time-text {
@@ -417,6 +481,12 @@ const styles = `
     border-radius: 22px;
     background: rgba(255,255,255,0.045);
     border: 1px solid rgba(255,255,255,0.08);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .stat-box:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.14);
   }
 
   .stat-icon {
@@ -497,6 +567,7 @@ const styles = `
   .lesson-item:hover {
     transform: translateY(-2px);
     border-color: var(--accent);
+    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.22);
   }
 
   .lesson-left {
@@ -611,6 +682,36 @@ const styles = `
     50% {
       transform: scale(1.15);
       opacity: 0.84;
+    }
+  }
+
+  @keyframes twinkleFloat {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(0.8);
+      opacity: 0.2;
+    }
+    25% {
+      transform: translate3d(6px, -10px, 0) scale(1);
+      opacity: 0.75;
+    }
+    50% {
+      transform: translate3d(-4px, -18px, 0) scale(1.25);
+      opacity: 1;
+    }
+    75% {
+      transform: translate3d(5px, -8px, 0) scale(0.95);
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes softGlow {
+    0%, 100% {
+      text-shadow: 0 8px 30px rgba(59, 130, 246, 0.18);
+    }
+    50% {
+      text-shadow:
+        0 10px 36px rgba(56, 189, 248, 0.24),
+        0 0 18px rgba(139, 92, 246, 0.16);
     }
   }
 
