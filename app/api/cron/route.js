@@ -20,8 +20,8 @@ function getPekan() {
 }
 
 async function kirimTelegram(pesan) {
-  const TOKEN = '8860261405:AAHjKOzyVXCglqHrpJm7Xb4he1mGkCqURlY';
-  const CHAT_ID = '5698906519';
+  const TOKEN = '';
+  const CHAT_ID = '';
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
   try {
     const response = await fetch(url, {
