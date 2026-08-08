@@ -22,9 +22,7 @@ function getPekan() {
 async function kirimTelegram(pesan) {
   const TOKEN = '8860261405:AAHjKOzyVXCglqHrpJm7Xb4he1mGkCqURlY';
   const CHAT_ID = '5698906519';
-
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -35,7 +33,6 @@ async function kirimTelegram(pesan) {
         parse_mode: 'HTML'
       })
     });
-
     const result = await response.json();
     console.log('✅ Telegram response:', result);
   } catch (error) {
@@ -43,13 +40,21 @@ async function kirimTelegram(pesan) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const testMode = searchParams.get('test') === 'true';
+  
+  if (testMode) {
+    console.log('🧪 TEST MODE: Dipanggil manual!');
+    await kirimTelegram('🧪 Test cron job berhasil!');
+    return NextResponse.json({ message: 'Test berhasil! Cek Telegram' });
+  }
+
   try {
     const now = new Date();
     const jam = now.getHours();
     const menit = now.getMinutes();
 
-    // ===== TETAP AMBIL JADWAL =====
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
     const hariIni = days[today.getDay()];
@@ -72,25 +77,28 @@ export async function GET() {
       });
     }
 
-    // ===== CEK JAM: KIRIM PESAN CUMA JAM 5.20 =====
-    let telegramStatus = 'skipped';
-    if (jam === 5 && menit === 20) {
+    // ✅ HANYA JAM 08.00 WIB (01.00 UTC) YANG BISA KIRIM!
+    if (jam === 1 && menit === 0) {
       await kirimTelegram(pesan);
-      telegramStatus = 'sent';
-      console.log('✅ Pesan dikirim jam 5.20!');
+      console.log('✅ Pesan dikirim jam 8.00 WIB!');
+      return NextResponse.json({
+        message: 'Pesan dikirim!',
+        jadwal: jadwalHariIni,
+        pekan: pekan,
+        hari: hariIni,
+        status: 'sent'
+      });
     } else {
-      console.log(`⏰ Bukan jam 5.20 (sekarang ${jam}:${menit}), skip kirim`);
+      console.log(`⏰ Bukan jam 8.00 WIB (sekarang ${jam}:${menit}), skip kirim`);
+      return NextResponse.json({
+        message: 'Bukan jam 8.00 WIB, pesan tidak dikirim',
+        currentTime: `${jam}:${menit}`,
+        status: 'skipped',
+        jadwal: jadwalHariIni,
+        pekan: pekan,
+        hari: hariIni
+      });
     }
-
-    // ===== TETAP KASIH DATA JADWAL =====
-    return NextResponse.json({
-      message: 'API dijalankan!',
-      jadwal: jadwalHariIni,
-      pekan: pekan,
-      hari: hariIni,
-      currentTime: `${jam}:${menit}`,
-      telegram: telegramStatus // 'sent' atau 'skipped'
-    });
 
   } catch (error) {
     console.error('❌ Error:', error.message);
