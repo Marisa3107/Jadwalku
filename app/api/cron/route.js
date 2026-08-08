@@ -78,9 +78,9 @@ export async function GET(request) {
     }
 
     // ✅ HANYA JAM 08.00 WIB (01.00 UTC) YANG BISA KIRIM!
-    if (jam === 1 && menit === 35) {
+    if (jam === 22 && menit === 30) {
       await kirimTelegram(pesan);
-      console.log('✅ Pesan dikirim jam 8.35 WIB!');
+      console.log('✅ Pesan dikirim jam 5.30 WIB!');
       return NextResponse.json({
         message: 'Pesan dikirim!',
         jadwal: jadwalHariIni,
@@ -89,9 +89,9 @@ export async function GET(request) {
         status: 'sent'
       });
     } else {
-      console.log(`⏰ Bukan jam 8.35 WIB (sekarang ${jam}:${menit}), skip kirim`);
+      console.log(`⏰ Bukan jam 5.30 WIB (sekarang ${jam}:${menit}), skip kirim`);
       return NextResponse.json({
-        message: 'Bukan jam 8.35 WIB, pesan tidak dikirim',
+        message: 'Bukan jam 5.30 WIB, pesan tidak dikirim',
         currentTime: `${jam}:${menit}`,
         status: 'skipped',
         jadwal: jadwalHariIni,
