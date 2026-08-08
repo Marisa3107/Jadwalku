@@ -78,7 +78,7 @@ export async function GET(request) {
     }
 
     // ✅ HANYA JAM 08.00 WIB (01.00 UTC) YANG BISA KIRIM!
-    if (jam === 1 && menit === 10) {
+    if (jam === 1 && menit === 15) {
       await kirimTelegram(pesan);
       console.log('✅ Pesan dikirim jam 8.00 WIB!');
       return NextResponse.json({
