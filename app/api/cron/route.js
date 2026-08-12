@@ -20,8 +20,8 @@ function getPekan(targetDate) {
 }
 
 async function kirimTelegram(pesan) {
-  const TOKEN = '7233155710:AAH0eP_sYp2p7qAZqRquHqXh4Tp7TIJNyfE';
-  const CHAT_ID = '7026708338';
+  const TOKEN = '8860261405:AAHjKOzyVXCglqHrpJm7Xb4he1mGkCqURlY';
+  const CHAT_ID = '5698906519';
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
   try {
     const response = await fetch(url, {
@@ -56,6 +56,25 @@ export async function GET(request) {
   // ===== CRON MODE =====
   if (cronMode) {
     console.log('⏰ CRON MODE: Dipanggil otomatis!');
+    
+    // ===== CEK JAM WIB =====
+    const now = new Date();
+    const jamWIB = now.getUTCHours() + 7; // UTC → WIB
+    const menitWIB = now.getUTCMinutes();
+    
+    console.log(`🕐 Waktu WIB: ${jamWIB}:${menitWIB}`);
+
+    // HANYA KIRIM JIKA JAM 5.30 WIB
+    if (jamWIB !== 5 || menitWIB !== 30) {
+      console.log(`⏰ Bukan jam 5.30 WIB (sekarang ${jamWIB}:${menitWIB}), skip kirim`);
+      return NextResponse.json({
+        message: `Bukan jam 5.30 WIB, sekarang ${jamWIB}:${menitWIB}`,
+        status: 'skipped',
+        currentTime: `${jamWIB}:${menitWIB}`
+      });
+    }
+
+    // ===== AMBIL JADWAL =====
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
     const hariIni = days[today.getDay()];
