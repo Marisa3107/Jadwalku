@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [jadwal, setJadwal] = useState(null);
@@ -9,7 +10,21 @@ export default function Home() {
   const [greetingEmoji, setGreetingEmoji] = useState('');
   const [currentTime, setCurrentTime] = useState('');
   const [countDisplay, setCountDisplay] = useState(0);
+  const [hariOffset, setHariOffset] = useState(0);
   const countedRef = useRef(false);
+
+  const fetchJadwal = (offset) => {
+    setLoading(true);
+    setCountDisplay(0);
+    countedRef.current = false;
+    fetch(`/api/cron?offset=${offset}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setJadwal(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -52,20 +67,18 @@ export default function Home() {
     updateTime();
     const interval = setInterval(updateTime, 60000);
 
-    fetch('/api/cron')
-      .then((res) => res.json())
-      .then((data) => {
-        setJadwal(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    fetchJadwal(0);
 
     return () => clearInterval(interval);
   }, []);
 
-  const totalMapel = jadwal?.jadwal?.length || 0;
+  const totalMapel = jadwal?.jadwal?.filter(
+    (item) => {
+      const mapel = typeof item === 'string' ? item : item.mapel;
+      return mapel.toUpperCase() !== 'ISTIRAHAT' && mapel.toUpperCase() !== 'PAGCER';
+    }
+  ).length || 0;
 
-  // Animasi hitung naik untuk angka jumlah mata pelajaran, sekali saja saat data siap
   useEffect(() => {
     if (loading || countedRef.current) return;
     countedRef.current = true;
@@ -87,9 +100,8 @@ export default function Home() {
     }, stepTime);
 
     return () => clearInterval(tick);
-  }, [loading, totalMapel]);
+  }, [loading, totalMapel, jadwal]);
 
-  // Aksen kuningan bertingkat gelap→terang untuk tiap baris pelajaran
   const colors = [
     '#C9A227', '#B8863B', '#9C8A4E', '#A8762F', '#8E9B6E',
     '#B08D57', '#6E8B7A', '#BF7E3F', '#7A8FA6', '#AD9642',
@@ -114,11 +126,18 @@ export default function Home() {
 
   const isLibur = !jadwal?.jadwal || jadwal.jadwal.length === 0;
   const hari = jadwal?.hari?.charAt(0).toUpperCase() + jadwal?.hari?.slice(1) || '';
+  const hariDisplay = jadwal?.hariDisplay || hari;
 
   const formatPekan = (pekan) => {
     if (!pekan) return 'PEKAN';
     const number = pekan.replace('pekan', '');
     return `PEKAN ${number.toUpperCase()}`;
+  };
+
+  const formatJam = (jam) => {
+    const hours = Math.floor(jam);
+    const minutes = Math.round((jam - hours) * 60);
+    return `${String(hours).padStart(2, '0')}.${String(minutes).padStart(2, '0')}`;
   };
 
   return (
@@ -167,7 +186,7 @@ export default function Home() {
                   📖 {formatPekan(jadwal?.pekan)}
                 </span>
                 <span className="mil-tag mil-tag-alt reveal" style={{ '--delay': '0.28s' }}>
-                  📅 {hari}
+                  📅 {hariDisplay}
                 </span>
               </div>
             </div>
@@ -185,10 +204,37 @@ export default function Home() {
 
             <div className="hairline reveal" style={{ '--delay': '0.4s' }} />
 
+            {/* ===== TOMBOL NAVIGASI + TUGAS ===== */}
+            <div className="nav-row reveal" style={{ '--delay': '0.42s' }}>
+              <button 
+                className={`nav-btn ${hariOffset === 0 ? 'active' : ''}`} 
+                onClick={() => { setHariOffset(0); fetchJadwal(0); }}
+              >
+                📅 Hari Ini
+              </button>
+              <button 
+                className={`nav-btn ${hariOffset === 1 ? 'active' : ''}`} 
+                onClick={() => { setHariOffset(1); fetchJadwal(1); }}
+              >
+                📅 Besok
+              </button>
+              <button 
+                className={`nav-btn ${hariOffset === 2 ? 'active' : ''}`} 
+                onClick={() => { setHariOffset(2); fetchJadwal(2); }}
+              >
+                📅 Lusa
+              </button>
+              <Link href="/tugas" className="nav-btn tugas-btn">
+                📋 Tugas
+              </Link>
+            </div>
+
             <div className="section-head reveal" style={{ '--delay': '0.44s' }}>
               <div>
                 <p className="section-kicker">Daftar Pelajaran</p>
-                <h2 className="section-title">Jadwal Hari Ini</h2>
+                <h2 className="section-title">
+                  {hariOffset === 0 ? 'Hari Ini' : hariOffset === 1 ? 'Besok' : 'Lusa'}
+                </h2>
               </div>
               <span className="count-badge">{totalMapel}</span>
             </div>
@@ -196,32 +242,61 @@ export default function Home() {
             {isLibur ? (
               <div className="empty-block reveal" style={{ '--delay': '0.5s' }}>
                 <div className="empty-icon">🎉</div>
-                <h3>Hari Ini Libur!</h3>
+                <h3>
+                  {hariOffset === 0 ? 'Hari Ini Libur!' : hariOffset === 1 ? 'Besok Libur!' : 'Lusa Libur!'}
+                </h3>
                 <p>Tidak ada jadwal. Manfaatkan waktumu sebaik mungkin.</p>
               </div>
             ) : (
               <div className="entry-list">
-                {jadwal?.jadwal?.map((mapel, index) => {
-                  const jam = 7 + index;
+                {jadwal?.jadwal?.map((item, index) => {
+                  const isString = typeof item === 'string';
+                  const mapel = isString ? item : item.mapel;
+                  const isBreak = mapel.toUpperCase() === 'ISTIRAHAT';
+                  const isPagcer = mapel.toUpperCase() === 'PAGCER';
+                  
+                  let jamMulai = 7 + (index * 0.75);
+                  let durasi = 0.75;
+                  if (isBreak) durasi = 0.25;
+                  if (isPagcer) durasi = 0.75;
+                  
+                  const jamSelesai = jamMulai + durasi;
+                  const jamDisplay = `${formatJam(jamMulai)} - ${formatJam(jamSelesai)}`;
+                  
+                  const jamFromData = !isString && item.jam ? item.jam : null;
+                  
                   const color = colors[index % colors.length];
                   const icon = ['📐', '🔬', '📖', '✏️', '🧮', '🎨', '🏃', '💻', '📝', '🌍'][index % 10];
+                  
                   return (
                     <div
                       key={index}
-                      className="entry-item"
+                      className={`entry-item ${isBreak ? 'break-item' : ''}`}
                       style={{
-                        '--accent': color,
+                        '--accent': isBreak ? '#C9A227' : color,
                         '--delay': `${0.46 + index * 0.055}s`,
                       }}
                     >
                       <div className="entry-left">
-                        <div className="hour-badge">{jam}</div>
+                        <div className="hour-badge" style={{
+                          background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' : undefined
+                        }}>
+                          {index + 1}
+                        </div>
                         <div>
-                          <div className="mapel-name">{mapel}</div>
-                          <div className="mapel-sub">Sesi {index + 1}</div>
+                          <div className="mapel-name" style={{
+                            color: isBreak ? '#E7C567' : undefined
+                          }}>
+                            {mapel}
+                          </div>
+                          <div className="mapel-sub">
+                            {isBreak ? `☕ Istirahat (${jamDisplay})` : (jamFromData || jamDisplay)}
+                          </div>
                         </div>
                       </div>
-                      <div className="icon-slot">{icon}</div>
+                      <div className="icon-slot">
+                        {isBreak ? '☕' : icon}
+                      </div>
                     </div>
                   );
                 })}
@@ -575,6 +650,54 @@ const styles = `
     animation-delay: var(--delay, 0s);
   }
 
+  .nav-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Space Grotesk', sans-serif;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-btn:hover {
+    background: rgba(201, 162, 39, 0.1);
+    border-color: var(--brass);
+  }
+
+  .nav-btn.active {
+    background: var(--brass);
+    color: #17130F;
+    border-color: var(--brass);
+    font-weight: 600;
+  }
+
+  .tugas-btn {
+    background: rgba(201, 162, 39, 0.12) !important;
+    border-color: var(--brass) !important;
+    color: var(--brass-bright) !important;
+  }
+
+  .tugas-btn:hover {
+    background: rgba(201, 162, 39, 0.25) !important;
+    transform: translateY(-2px);
+  }
+
   .section-head {
     display: flex;
     align-items: end;
@@ -692,6 +815,7 @@ const styles = `
     margin-top: 3px;
     font-size: 11.5px;
     color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
   }
 
   .icon-slot {
@@ -845,6 +969,11 @@ const styles = `
 
     .elastic-band {
       right: 30px;
+    }
+
+    .nav-btn {
+      font-size: 11px;
+      padding: 5px 10px;
     }
   }
 `;

@@ -8,9 +8,9 @@ function getJadwal() {
   return JSON.parse(jsonData);
 }
 
-function getPekan() {
+function getPekan(targetDate) {
   const startDate = new Date(2026, 6, 13);
-  const today = new Date();
+  const today = targetDate || new Date();
   const diffTime = Math.abs(today - startDate);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   const pekan = Math.ceil(diffDays / 7);
@@ -20,8 +20,8 @@ function getPekan() {
 }
 
 async function kirimTelegram(pesan) {
-  const TOKEN = '';
-  const CHAT_ID = '';
+  const TOKEN = '7233155710:AAH0eP_sYp2p7qAZqRquHqXh4Tp7TIJNyfE';
+  const CHAT_ID = '7026708338';
   const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
   try {
     const response = await fetch(url, {
@@ -43,25 +43,26 @@ async function kirimTelegram(pesan) {
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const testMode = searchParams.get('test') === 'true';
-  
+  const cronMode = searchParams.get('cron') === 'true';
+  const offset = parseInt(searchParams.get('offset')) || 0;
+
+  // ===== TEST MODE =====
   if (testMode) {
     console.log('🧪 TEST MODE: Dipanggil manual!');
     await kirimTelegram('🧪 Test cron job berhasil!');
     return NextResponse.json({ message: 'Test berhasil! Cek Telegram' });
   }
 
-  try {
-    const now = new Date();
-    const jam = now.getHours();
-    const menit = now.getMinutes();
-
+  // ===== CRON MODE =====
+  if (cronMode) {
+    console.log('⏰ CRON MODE: Dipanggil otomatis!');
     const today = new Date();
     const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
     const hariIni = days[today.getDay()];
-    const pekan = getPekan();
+    const pekan = getPekan(today);
 
     const semuaJadwal = getJadwal();
-    const jadwalHariIni = semuaJadwal[pekan][hariIni] || [];
+    const jadwalHariIni = semuaJadwal[pekan]?.[hariIni] || [];
 
     let pesan = `📚 <b>JADWAL SEKOLAH</b> 📚\n`;
     pesan += `📅 Hari: ${hariIni.charAt(0).toUpperCase() + hariIni.slice(1)}\n`;
@@ -77,28 +78,45 @@ export async function GET(request) {
       });
     }
 
-    // ✅ HANYA JAM 08.00 WIB (01.00 UTC) YANG BISA KIRIM!
-    if (jam === 22 && menit === 30) {
-      await kirimTelegram(pesan);
-      console.log('✅ Pesan dikirim jam 5.30 WIB!');
-      return NextResponse.json({
-        message: 'Pesan dikirim!',
-        jadwal: jadwalHariIni,
-        pekan: pekan,
-        hari: hariIni,
-        status: 'sent'
-      });
-    } else {
-      console.log(`⏰ Bukan jam 5.30 WIB (sekarang ${jam}:${menit}), skip kirim`);
-      return NextResponse.json({
-        message: 'Bukan jam 5.30 WIB, pesan tidak dikirim',
-        currentTime: `${jam}:${menit}`,
-        status: 'skipped',
-        jadwal: jadwalHariIni,
-        pekan: pekan,
-        hari: hariIni
-      });
-    }
+    await kirimTelegram(pesan);
+    console.log('✅ Pesan dikirim via cron mode!');
+    return NextResponse.json({
+      message: 'Pesan dikirim via cron mode!',
+      jadwal: jadwalHariIni,
+      pekan: pekan,
+      hari: hariIni,
+      status: 'sent'
+    });
+  }
+
+  // ===== API NORMAL (dengan offset) =====
+  try {
+    const today = new Date();
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + offset);
+
+    const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+    const hariIni = days[targetDate.getDay()];
+    const pekan = getPekan(targetDate);
+
+    const semuaJadwal = getJadwal();
+    const jadwalHariIni = semuaJadwal[pekan]?.[hariIni] || [];
+
+    const hariDisplay = targetDate.toLocaleDateString('id-ID', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    return NextResponse.json({
+      message: 'API dijalankan!',
+      jadwal: jadwalHariIni,
+      pekan: pekan,
+      hari: hariIni,
+      hariDisplay: hariDisplay,
+      offset: offset
+    });
 
   } catch (error) {
     console.error('❌ Error:', error.message);
