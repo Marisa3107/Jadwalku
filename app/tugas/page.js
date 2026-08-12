@@ -82,12 +82,11 @@ export default function TugasPage() {
               <Link href="/" className="nav-back">
                 ← Kembali
               </Link>
-              <span className="nav-title">📋 Tugas & PR</span>
               <span></span>
             </div>
 
             <div className="header-block">
-              <h1 className="greeting-title">📋 Daftar Tugas</h1>
+              <h1 className="greeting-title">📋 Daftar Tugas & PR</h1>
               <p className="time-text">Catat semua tugas dan deadline di sini</p>
             </div>
 

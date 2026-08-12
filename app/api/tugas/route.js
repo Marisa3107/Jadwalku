@@ -1,58 +1,52 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
-const filePath = path.join(process.cwd(), 'data', 'tugas.json');
-
-function getTugas() {
-  try {
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-function saveTugas(tugas) {
-  fs.writeFileSync(filePath, JSON.stringify(tugas, null, 2));
-}
+// ===== SIMPAN DI MEMORY (DATA ILANG KALO REDEPLOY) =====
+let tugasMemory = [];
 
 export async function GET() {
-  const tugas = getTugas();
-  return NextResponse.json(tugas);
+  return NextResponse.json(tugasMemory);
 }
 
 export async function POST(request) {
-  const body = await request.json();
-  const tugas = getTugas();
-  const newTugas = {
-    id: Date.now(),
-    text: body.text,
-    deadline: body.deadline || null,
-    selesai: false,
-    createdAt: new Date().toISOString()
-  };
-  tugas.push(newTugas);
-  saveTugas(tugas);
-  return NextResponse.json(newTugas);
+  try {
+    const body = await request.json();
+    const newTugas = {
+      id: Date.now(),
+      text: body.text,
+      deadline: body.deadline || null,
+      selesai: false,
+      createdAt: new Date().toISOString()
+    };
+    tugasMemory.push(newTugas);
+    return NextResponse.json(newTugas);
+  } catch (error) {
+    console.error('❌ Error POST tugas:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function PUT(request) {
-  const { id, selesai } = await request.json();
-  const tugas = getTugas();
-  const index = tugas.findIndex(t => t.id === id);
-  if (index !== -1) {
-    tugas[index].selesai = selesai;
-    saveTugas(tugas);
-    return NextResponse.json(tugas[index]);
+  try {
+    const { id, selesai } = await request.json();
+    const index = tugasMemory.findIndex(t => t.id === id);
+    if (index !== -1) {
+      tugasMemory[index].selesai = selesai;
+      return NextResponse.json(tugasMemory[index]);
+    }
+    return NextResponse.json({ error: 'Tugas tidak ditemukan' }, { status: 404 });
+  } catch (error) {
+    console.error('❌ Error PUT tugas:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ error: 'Tugas tidak ditemukan' }, { status: 404 });
 }
 
 export async function DELETE(request) {
-  const { id } = await request.json();
-  const tugas = getTugas();
-  const filtered = tugas.filter(t => t.id !== id);
-  saveTugas(filtered);
-  return NextResponse.json({ success: true });
+  try {
+    const { id } = await request.json();
+    tugasMemory = tugasMemory.filter(t => t.id !== id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('❌ Error DELETE tugas:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
