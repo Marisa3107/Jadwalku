@@ -72,6 +72,25 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // ===== AUTO REFRESH JAM 5 PAGI (BIAR JADWAL UPDATED) =====
+  useEffect(() => {
+    const checkRefresh = () => {
+      const now = new Date();
+      const jam = now.getHours();
+      const menit = now.getMinutes();
+      // Kalo jam 5.00 - 5.05, refresh otomatis
+      if (jam === 5 && menit <= 5) {
+        console.log('🔄 Auto refresh jam 5 pagi!');
+        window.location.reload();
+      }
+    };
+
+    // Cek setiap 30 detik
+    const refreshInterval = setInterval(checkRefresh, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, []);
+
   const totalMapel = jadwal?.jadwal?.filter(
     (item) => {
       const mapel = typeof item === 'string' ? item : item.mapel;
@@ -204,7 +223,6 @@ export default function Home() {
 
             <div className="hairline reveal" style={{ '--delay': '0.4s' }} />
 
-            {/* ===== TOMBOL NAVIGASI + TUGAS ===== */}
             <div className="nav-row reveal" style={{ '--delay': '0.42s' }}>
               <button 
                 className={`nav-btn ${hariOffset === 0 ? 'active' : ''}`} 

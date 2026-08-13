@@ -1,15 +1,22 @@
 import { NextResponse } from 'next/server';
+import { kv } from '@vercel/kv';
 
-// ===== SIMPAN DI MEMORY (DATA ILANG KALO REDEPLOY) =====
-let tugasMemory = [];
+const KEY = 'tugas';
 
 export async function GET() {
-  return NextResponse.json(tugasMemory);
+  try {
+    const tugas = await kv.get(KEY) || [];
+    return NextResponse.json(tugas);
+  } catch (error) {
+    console.error('❌ Error GET tugas:', error);
+    return NextResponse.json([]);
+  }
 }
 
 export async function POST(request) {
   try {
     const body = await request.json();
+    const tugas = await kv.get(KEY) || [];
     const newTugas = {
       id: Date.now(),
       text: body.text,
@@ -17,7 +24,8 @@ export async function POST(request) {
       selesai: false,
       createdAt: new Date().toISOString()
     };
-    tugasMemory.push(newTugas);
+    tugas.push(newTugas);
+    await kv.set(KEY, tugas);
     return NextResponse.json(newTugas);
   } catch (error) {
     console.error('❌ Error POST tugas:', error);
@@ -28,10 +36,12 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const { id, selesai } = await request.json();
-    const index = tugasMemory.findIndex(t => t.id === id);
+    const tugas = await kv.get(KEY) || [];
+    const index = tugas.findIndex(t => t.id === id);
     if (index !== -1) {
-      tugasMemory[index].selesai = selesai;
-      return NextResponse.json(tugasMemory[index]);
+      tugas[index].selesai = selesai;
+      await kv.set(KEY, tugas);
+      return NextResponse.json(tugas[index]);
     }
     return NextResponse.json({ error: 'Tugas tidak ditemukan' }, { status: 404 });
   } catch (error) {
@@ -43,7 +53,9 @@ export async function PUT(request) {
 export async function DELETE(request) {
   try {
     const { id } = await request.json();
-    tugasMemory = tugasMemory.filter(t => t.id !== id);
+    const tugas = await kv.get(KEY) || [];
+    const filtered = tugas.filter(t => t.id !== id);
+    await kv.set(KEY, filtered);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('❌ Error DELETE tugas:', error);
