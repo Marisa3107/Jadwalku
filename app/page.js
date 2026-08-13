@@ -55,8 +55,10 @@ export default function Home() {
       // Skip ISTIRAHAT & PAGCER
       if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
       
-      const jamMulai = 7 + (i * 0.75);
-      const durasi = 0.75; // 45 menit
+      // ===== HITUNG JAM SESUAI JADWAL ASLI (40 MENIT PER SESI) =====
+      let jamMulai = 7 + (i * 0.6667);
+      let durasi = 0.6667;
+      
       const jamSelesai = jamMulai + durasi;
       
       if (jamSekarang >= jamMulai && jamSekarang < jamSelesai) {
@@ -81,7 +83,7 @@ export default function Home() {
         const item = jadwalData.jadwal[i];
         const mapel = typeof item === 'string' ? item : item.mapel;
         if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
-        const jamMulai = 7 + (i * 0.75);
+        let jamMulai = 7 + (i * 0.6667);
         if (jamSekarang < jamMulai) {
           nextIndex = i;
           break;
@@ -91,7 +93,7 @@ export default function Home() {
       if (nextIndex !== -1) {
         const item = jadwalData.jadwal[nextIndex];
         const mapel = typeof item === 'string' ? item : item.mapel;
-        const jamMulai = 7 + (nextIndex * 0.75);
+        let jamMulai = 7 + (nextIndex * 0.6667);
         setPelajaranBerikutnya({
           mapel: mapel,
           jamMulai: jamMulai,
@@ -116,7 +118,7 @@ export default function Home() {
       if (nextIndex !== -1) {
         const item = jadwalData.jadwal[nextIndex];
         const mapel = typeof item === 'string' ? item : item.mapel;
-        const jamMulai = 7 + (nextIndex * 0.75);
+        let jamMulai = 7 + (nextIndex * 0.6667);
         setPelajaranBerikutnya({
           mapel: mapel,
           jamMulai: jamMulai,
@@ -277,6 +279,37 @@ export default function Home() {
     return `${String(hours).padStart(2, '0')}.${String(minutes).padStart(2, '0')}`;
   };
 
+  // ===== FUNGSI HITUNG JAM UNTUK DAFTAR PELAJARAN =====
+  const getJamPelajaran = (index, mapel, hari) => {
+  const isBreak = mapel.toUpperCase() === 'ISTIRAHAT';
+  const isPagcer = mapel.toUpperCase() === 'PAGCER';
+  const isJumat = hari?.toLowerCase() === 'jumat';
+  
+  let jamMulai = 7 + (index * 0.6667);
+  let durasi = 0.6667; // 40 menit
+
+  if (isBreak) {
+    if (isJumat) {
+      // Jumat: ISTIRAHAT 50 menit (index 6)
+      durasi = 0.8333; // 50 menit
+    } else {
+      // Senin-Kamis: ISTIRAHAT 1 (index 4) = 15 menit, ISTIRAHAT 2 (index 8) = 40 menit
+      if (index === 4) {
+        durasi = 0.25; // 15 menit
+      } else {
+        durasi = 0.6667; // 40 menit
+      }
+    }
+  }
+  if (isPagcer) {
+    jamMulai = 7 + (index * 0.6667);
+    durasi = 0.6667;
+  }
+  
+  const jamSelesai = jamMulai + durasi;
+  return { jamMulai, jamSelesai, durasi };
+};
+
   return (
     <>
       <style>{styles}</style>
@@ -328,7 +361,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ===== FITUR JAM SEDANG BERLANGSUNG ===== */}
+            {/* ===== LIVE INDICATOR ===== */}
             {!isLibur && (
               <div className="live-block reveal" style={{ '--delay': '0.32s' }}>
                 {pelajaranSekarang ? (
@@ -445,12 +478,8 @@ export default function Home() {
                   const isPagcer = mapel.toUpperCase() === 'PAGCER';
                   const isActive = index === indexSekarang && pelajaranSekarang !== null;
                   
-                  let jamMulai = 7 + (index * 0.75);
-                  let durasi = 0.75;
-                  if (isBreak) durasi = 0.25;
-                  if (isPagcer) durasi = 0.75;
-                  
-                  const jamSelesai = jamMulai + durasi;
+                  // ===== HITUNG JAM PAKE FUNGSI getJamPelajaran =====
+                  const { jamMulai, jamSelesai, durasi } = getJamPelajaran(index, mapel);
                   const jamDisplay = `${formatJam(jamMulai)} - ${formatJam(jamSelesai)}`;
                   
                   const jamFromData = !isString && item.jam ? item.jam : null;
