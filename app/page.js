@@ -525,9 +525,9 @@ export default function Home() {
             )}
 
             <div className="footer-note reveal" style={{ '--delay': '0.7s' }}>
-              <span>⏰ 05:30</span>
+              <span>⏰</span>
               <span className="dot">—</span>
-              <span>🤖 Telegram</span>
+              <span>🤖 Chrow's</span>
               <span className="dot">—</span>
               <span>Vol. 01</span>
             </div>
