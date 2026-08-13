@@ -13,6 +13,12 @@ export default function Home() {
   const [hariOffset, setHariOffset] = useState(0);
   const countedRef = useRef(false);
 
+  // ===== STATE UNTUK JAM BERLANGSUNG =====
+  const [pelajaranSekarang, setPelajaranSekarang] = useState(null);
+  const [pelajaranBerikutnya, setPelajaranBerikutnya] = useState(null);
+  const [menitTersisa, setMenitTersisa] = useState(0);
+  const [indexSekarang, setIndexSekarang] = useState(-1);
+
   const fetchJadwal = (offset) => {
     setLoading(true);
     setCountDisplay(0);
@@ -25,6 +31,115 @@ export default function Home() {
       })
       .catch(() => setLoading(false));
   };
+
+  // ===== CEK JAM PELAJARAN SEDANG BERLANGSUNG =====
+  const cekPelajaranSekarang = (jadwalData) => {
+    if (!jadwalData || !jadwalData.jadwal || jadwalData.jadwal.length === 0) {
+      setPelajaranSekarang(null);
+      setPelajaranBerikutnya(null);
+      setIndexSekarang(-1);
+      return;
+    }
+
+    const now = new Date();
+    const jamSekarang = now.getHours() + now.getMinutes() / 60;
+
+    let index = -1;
+    let found = false;
+
+    // Cari pelajaran yang sedang berlangsung
+    for (let i = 0; i < jadwalData.jadwal.length; i++) {
+      const item = jadwalData.jadwal[i];
+      const mapel = typeof item === 'string' ? item : item.mapel;
+      
+      // Skip ISTIRAHAT & PAGCER
+      if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+      
+      const jamMulai = 7 + (i * 0.75);
+      const durasi = 0.75; // 45 menit
+      const jamSelesai = jamMulai + durasi;
+      
+      if (jamSekarang >= jamMulai && jamSekarang < jamSelesai) {
+        index = i;
+        found = true;
+        setPelajaranSekarang({
+          mapel: mapel,
+          jamMulai: jamMulai,
+          jamSelesai: jamSelesai,
+          index: i,
+          selesaiDalam: Math.round((jamSelesai - jamSekarang) * 60)
+        });
+        setIndexSekarang(i);
+        break;
+      }
+    }
+
+    if (!found) {
+      // Cari pelajaran berikutnya
+      let nextIndex = -1;
+      for (let i = 0; i < jadwalData.jadwal.length; i++) {
+        const item = jadwalData.jadwal[i];
+        const mapel = typeof item === 'string' ? item : item.mapel;
+        if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+        const jamMulai = 7 + (i * 0.75);
+        if (jamSekarang < jamMulai) {
+          nextIndex = i;
+          break;
+        }
+      }
+
+      if (nextIndex !== -1) {
+        const item = jadwalData.jadwal[nextIndex];
+        const mapel = typeof item === 'string' ? item : item.mapel;
+        const jamMulai = 7 + (nextIndex * 0.75);
+        setPelajaranBerikutnya({
+          mapel: mapel,
+          jamMulai: jamMulai,
+          index: nextIndex,
+          mulaiDalam: Math.round((jamMulai - jamSekarang) * 60)
+        });
+      } else {
+        setPelajaranBerikutnya(null);
+      }
+      setPelajaranSekarang(null);
+      setIndexSekarang(-1);
+    } else {
+      // Cari pelajaran berikutnya setelah yang sekarang
+      let nextIndex = -1;
+      for (let i = index + 1; i < jadwalData.jadwal.length; i++) {
+        const item = jadwalData.jadwal[i];
+        const mapel = typeof item === 'string' ? item : item.mapel;
+        if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+        nextIndex = i;
+        break;
+      }
+      if (nextIndex !== -1) {
+        const item = jadwalData.jadwal[nextIndex];
+        const mapel = typeof item === 'string' ? item : item.mapel;
+        const jamMulai = 7 + (nextIndex * 0.75);
+        setPelajaranBerikutnya({
+          mapel: mapel,
+          jamMulai: jamMulai,
+          index: nextIndex,
+          mulaiDalam: Math.round((jamMulai - (now.getHours() + now.getMinutes() / 60)) * 60)
+        });
+      } else {
+        setPelajaranBerikutnya(null);
+      }
+    }
+  };
+
+  // ===== UPDATE MENIT TERSISA TIAP DETIK =====
+  useEffect(() => {
+    if (!pelajaranSekarang) return;
+    const interval = setInterval(() => {
+      const now = new Date();
+      const jamSekarang = now.getHours() + now.getMinutes() / 60;
+      const sisa = Math.round((pelajaranSekarang.jamSelesai - jamSekarang) * 60);
+      setMenitTersisa(Math.max(0, sisa));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [pelajaranSekarang]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -72,22 +187,25 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // ===== AUTO REFRESH JAM 5 PAGI (BIAR JADWAL UPDATED) =====
+  // ===== PANGGIL cekPelajaranSekarang SETIAP JADWAL BERUBAH =====
+  useEffect(() => {
+    if (jadwal) {
+      cekPelajaranSekarang(jadwal);
+    }
+  }, [jadwal]);
+
+  // ===== AUTO REFRESH JAM 5 PAGI =====
   useEffect(() => {
     const checkRefresh = () => {
       const now = new Date();
       const jam = now.getHours();
       const menit = now.getMinutes();
-      // Kalo jam 5.00 - 5.05, refresh otomatis
       if (jam === 5 && menit <= 5) {
         console.log('🔄 Auto refresh jam 5 pagi!');
         window.location.reload();
       }
     };
-
-    // Cek setiap 30 detik
     const refreshInterval = setInterval(checkRefresh, 30000);
-
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -210,6 +328,59 @@ export default function Home() {
               </div>
             </div>
 
+            {/* ===== FITUR JAM SEDANG BERLANGSUNG ===== */}
+            {!isLibur && (
+              <div className="live-block reveal" style={{ '--delay': '0.32s' }}>
+                {pelajaranSekarang ? (
+                  <div className="live-indicator">
+                    <span className="live-dot"></span>
+                    <div className="live-content">
+                      <div className="live-title">
+                        🕐 Sekarang Jam ke-{pelajaranSekarang.index + 1}
+                      </div>
+                      <div className="live-mapel">
+                        <strong>{pelajaranSekarang.mapel}</strong>
+                      </div>
+                      <div className="live-time">
+                        {formatJam(pelajaranSekarang.jamMulai)} - {formatJam(pelajaranSekarang.jamSelesai)}
+                      </div>
+                      <div className="live-countdown">
+                        ⏳ Selesai dalam <span className="countdown-number">{menitTersisa}</span> menit
+                      </div>
+                    </div>
+                  </div>
+                ) : pelajaranBerikutnya ? (
+                  <div className="live-indicator next">
+                    <span className="live-dot next-dot"></span>
+                    <div className="live-content">
+                      <div className="live-title">
+                        ⏰ Selanjutnya: Jam ke-{pelajaranBerikutnya.index + 1}
+                      </div>
+                      <div className="live-mapel">
+                        <strong>{pelajaranBerikutnya.mapel}</strong>
+                      </div>
+                      <div className="live-time">
+                        Mulai {formatJam(pelajaranBerikutnya.jamMulai)}
+                      </div>
+                      {pelajaranBerikutnya.mulaiDalam > 0 && (
+                        <div className="live-countdown">
+                          ⏳ Mulai dalam <span className="countdown-number">{pelajaranBerikutnya.mulaiDalam}</span> menit
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="live-indicator done">
+                    <span className="live-dot done-dot"></span>
+                    <div className="live-content">
+                      <div className="live-title">🎉 Hari ini selesai!</div>
+                      <div className="live-mapel">Semua pelajaran sudah selesai</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="stats-row reveal" style={{ '--delay': '0.34s' }}>
               <div className="stat-block">
                 <div className="stat-value">{countDisplay}</div>
@@ -272,6 +443,7 @@ export default function Home() {
                   const mapel = isString ? item : item.mapel;
                   const isBreak = mapel.toUpperCase() === 'ISTIRAHAT';
                   const isPagcer = mapel.toUpperCase() === 'PAGCER';
+                  const isActive = index === indexSekarang && pelajaranSekarang !== null;
                   
                   let jamMulai = 7 + (index * 0.75);
                   let durasi = 0.75;
@@ -289,7 +461,7 @@ export default function Home() {
                   return (
                     <div
                       key={index}
-                      className={`entry-item ${isBreak ? 'break-item' : ''}`}
+                      className={`entry-item ${isBreak ? 'break-item' : ''} ${isActive ? 'active-item' : ''}`}
                       style={{
                         '--accent': isBreak ? '#C9A227' : color,
                         '--delay': `${0.46 + index * 0.055}s`,
@@ -297,23 +469,25 @@ export default function Home() {
                     >
                       <div className="entry-left">
                         <div className="hour-badge" style={{
-                          background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' : undefined
+                          background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' : 
+                          isActive ? 'linear-gradient(155deg, #4ECDC4, #1A8A7A)' : undefined
                         }}>
                           {index + 1}
                         </div>
                         <div>
                           <div className="mapel-name" style={{
-                            color: isBreak ? '#E7C567' : undefined
+                            color: isBreak ? '#E7C567' : isActive ? '#4ECDC4' : undefined
                           }}>
-                            {mapel}
+                            {isActive && '▶ '}{mapel}
                           </div>
                           <div className="mapel-sub">
                             {isBreak ? `☕ Istirahat (${jamDisplay})` : (jamFromData || jamDisplay)}
+                            {isActive && <span className="active-badge"> ● Sedang</span>}
                           </div>
                         </div>
                       </div>
                       <div className="icon-slot">
-                        {isBreak ? '☕' : icon}
+                        {isBreak ? '☕' : isActive ? '🔴' : icon}
                       </div>
                     </div>
                   );
@@ -621,6 +795,94 @@ const styles = `
     border-color: rgba(122, 59, 59, 0.6);
   }
 
+  /* ===== LIVE INDICATOR ===== */
+  .live-block {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: rgba(78, 205, 196, 0.08);
+    border: 1px solid rgba(78, 205, 196, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .live-indicator {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .live-indicator.next {
+    background: rgba(69, 183, 209, 0.06);
+    border-color: rgba(69, 183, 209, 0.12);
+  }
+
+  .live-indicator.done {
+    background: rgba(255, 234, 167, 0.06);
+    border-color: rgba(255, 234, 167, 0.12);
+  }
+
+  .live-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4ECDC4;
+    flex-shrink: 0;
+    margin-top: 4px;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  .live-dot.next-dot {
+    background: #45B7D1;
+    animation: none;
+  }
+
+  .live-dot.done-dot {
+    background: #FFEAA7;
+    animation: none;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .live-content {
+    flex: 1;
+  }
+
+  .live-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+
+  .live-mapel {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+  }
+
+  .live-time {
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+
+  .live-countdown {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  .countdown-number {
+    color: #4ECDC4;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -787,6 +1049,14 @@ const styles = `
     border-color: var(--accent);
   }
 
+  .entry-item.active-item {
+    background: rgba(78, 205, 196, 0.08);
+    border-radius: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border: 1px solid rgba(78, 205, 196, 0.2);
+  }
+
   .entry-left {
     display: flex;
     align-items: center;
@@ -834,6 +1104,13 @@ const styles = `
     font-size: 11.5px;
     color: var(--ink-mute);
     font-family: 'JetBrains Mono', monospace;
+  }
+
+  .active-badge {
+    color: #4ECDC4;
+    font-weight: 600;
+    font-size: 11px;
+    margin-left: 6px;
   }
 
   .icon-slot {
@@ -992,6 +1269,14 @@ const styles = `
     .nav-btn {
       font-size: 11px;
       padding: 5px 10px;
+    }
+
+    .live-mapel {
+      font-size: 16px;
+    }
+
+    .live-title {
+      font-size: 12px;
     }
   }
 `;
