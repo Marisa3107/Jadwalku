@@ -37,7 +37,7 @@ export default function Home() {
     const isBreak = mapel.toUpperCase() === 'ISTIRAHAT';
     const isPagcer = mapel.toUpperCase() === 'PAGCER';
     const isJumat = hari?.toLowerCase() === 'jumat';
-    
+
     // ===== FILTER: HANYA PELAJARAN (BUKAN ISTIRAHAT & PAGCER) =====
     const filteredIndex = daftarJadwal
       .slice(0, index + 1)
@@ -47,8 +47,22 @@ export default function Home() {
       }).length - 1;
 
     // ===== SENIN-KAMIS (13 index: 0-12) =====
+    // PENTING: nilai di bawah adalah DESIMAL JAM YANG BENAR (menit/60),
+    // bukan notasi "jam.menit". Komentar di sebelah menunjukkan jam aslinya.
     const jamMulaiArray = [
-      7.00, 7.40, 8.20, 9.00, 9.40, 9.55, 10.35, 11.15, 11.55, 12.35, 13.15, 13.55, 14.35
+      7.0000,   // 07.00
+      7.6667,   // 07.40
+      8.3333,   // 08.20
+      9.0000,   // 09.00
+      9.6667,   // 09.40
+      9.9167,   // 09.55 (istirahat)
+      10.5833,  // 10.35
+      11.2500,  // 11.15
+      11.9167,  // 11.55
+      12.5833,  // 12.35
+      13.2500,  // 13.15
+      13.9167,  // 13.55
+      14.5833,  // 14.35
     ];
     const durasiArray = [
       0.6667, 0.6667, 0.6667, 0.6667, 0.25, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667
@@ -56,7 +70,17 @@ export default function Home() {
 
     // ===== JUMAT (11 index: 0-10) =====
     const jamMulaiJumat = [
-      7.00, 7.40, 8.20, 9.00, 9.40, 10.20, 11.00, 11.40, 12.30, 13.10, 13.50
+      7.0000,   // 07.00
+      7.6667,   // 07.40
+      8.3333,   // 08.20
+      9.0000,   // 09.00
+      9.6667,   // 09.40
+      10.3333,  // 10.20
+      11.0000,  // 11.00
+      11.6667,  // 11.40
+      12.5000,  // 12.30
+      13.1667,  // 13.10
+      13.8333,  // 13.50
     ];
     const durasiJumat = [
       0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.6667, 0.8333, 0.6667, 0.6667, 0.6667
@@ -92,11 +116,11 @@ export default function Home() {
     for (let i = 0; i < daftarJadwal.length; i++) {
       const item = daftarJadwal[i];
       const mapel = typeof item === 'string' ? item : item.mapel;
-      
+
       if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
-      
+
       const { jamMulai, jamSelesai } = getJamPelajaran(i, mapel, hari, daftarJadwal);
-      
+
       if (jamSekarang >= jamMulai && jamSekarang < jamSelesai) {
         index = i;
         found = true;
@@ -232,7 +256,7 @@ export default function Home() {
     };
 
     window.addEventListener('focus', handleFocus);
-    
+
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
@@ -447,20 +471,20 @@ export default function Home() {
             <div className="hairline reveal" style={{ '--delay': '0.4s' }} />
 
             <div className="nav-row reveal" style={{ '--delay': '0.42s' }}>
-              <button 
-                className={`nav-btn ${hariOffset === 0 ? 'active' : ''}`} 
+              <button
+                className={`nav-btn ${hariOffset === 0 ? 'active' : ''}`}
                 onClick={() => { setHariOffset(0); fetchJadwal(0); }}
               >
                 📅 Hari Ini
               </button>
-              <button 
-                className={`nav-btn ${hariOffset === 1 ? 'active' : ''}`} 
+              <button
+                className={`nav-btn ${hariOffset === 1 ? 'active' : ''}`}
                 onClick={() => { setHariOffset(1); fetchJadwal(1); }}
               >
                 📅 Besok
               </button>
-              <button 
-                className={`nav-btn ${hariOffset === 2 ? 'active' : ''}`} 
+              <button
+                className={`nav-btn ${hariOffset === 2 ? 'active' : ''}`}
                 onClick={() => { setHariOffset(2); fetchJadwal(2); }}
               >
                 📅 Lusa
@@ -496,15 +520,15 @@ export default function Home() {
                   const isBreak = mapel.toUpperCase() === 'ISTIRAHAT';
                   const isPagcer = mapel.toUpperCase() === 'PAGCER';
                   const isActive = index === indexSekarang && pelajaranSekarang !== null;
-                  
+
                   const { jamMulai, jamSelesai } = getJamPelajaran(index, mapel, hari, jadwal.jadwal);
                   const jamDisplay = `${formatJam(jamMulai)} - ${formatJam(jamSelesai)}`;
-                  
+
                   const jamFromData = !isString && item.jam ? item.jam : null;
-                  
+
                   const color = colors[index % colors.length];
                   const icon = ['📐', '🔬', '📖', '✏️', '🧮', '🎨', '🏃', '💻', '📝', '🌍'][index % 10];
-                  
+
                   return (
                     <div
                       key={index}
@@ -516,7 +540,7 @@ export default function Home() {
                     >
                       <div className="entry-left">
                         <div className="hour-badge" style={{
-                          background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' : 
+                          background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' :
                           isActive ? 'linear-gradient(155deg, #4ECDC4, #1A8A7A)' : undefined
                         }}>
                           {index + 1}
@@ -543,9 +567,9 @@ export default function Home() {
             )}
 
             <div className="footer-note reveal" style={{ '--delay': '0.7s' }}>
-              <span>⏰ 05:30</span>
+              <span>⏰</span>
               <span className="dot">—</span>
-              <span>🤖 Telegram</span>
+              <span>🤖 Chrow's</span>
               <span className="dot">—</span>
               <span>Vol. 01</span>
             </div>
