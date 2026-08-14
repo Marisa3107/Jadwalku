@@ -38,12 +38,14 @@ export default function Home() {
     const isPagcer = mapel.toUpperCase() === 'PAGCER';
     const isJumat = hari?.toLowerCase() === 'jumat';
 
-    // ===== FILTER: HANYA PELAJARAN (BUKAN ISTIRAHAT & PAGCER) =====
+    // ===== FILTER: SEMUA SLOT JAM SUNGGUHAN (HANYA ISTIRAHAT YANG DIKECUALIKAN) =====
+    // PAGCER tetap menempati slot jam seperti mapel biasa, jadi TIDAK dikecualikan di sini.
+    // Hanya ISTIRAHAT (jeda tanpa nomor urut mapel) yang dikecualikan dari hitungan slot.
     const filteredIndex = daftarJadwal
       .slice(0, index + 1)
       .filter((item) => {
         const m = typeof item === 'string' ? item : item.mapel;
-        return m.toUpperCase() !== 'ISTIRAHAT' && m.toUpperCase() !== 'PAGCER';
+        return m.toUpperCase() !== 'ISTIRAHAT';
       }).length - 1;
 
     // ===== SENIN-KAMIS (13 index: 0-12) =====
@@ -89,7 +91,7 @@ export default function Home() {
     const jamMulai = isJumat ? jamMulaiJumat : jamMulaiArray;
     const durasi = isJumat ? durasiJumat : durasiArray;
 
-    // PAKAI FILTERED INDEX (URUTAN PELAJARAN, TANPA ISTIRAHAT & PAGCER)
+    // PAKAI FILTERED INDEX (URUTAN SLOT JAM, TANPA ISTIRAHAT — PAGCER TETAP DIHITUNG)
     const jm = jamMulai[filteredIndex] || 7 + (filteredIndex * 0.6667);
     const dr = durasi[filteredIndex] || 0.6667;
     const js = jm + dr;
@@ -117,7 +119,7 @@ export default function Home() {
       const item = daftarJadwal[i];
       const mapel = typeof item === 'string' ? item : item.mapel;
 
-      if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+      if (mapel.toUpperCase() === 'ISTIRAHAT') continue;
 
       const { jamMulai, jamSelesai } = getJamPelajaran(i, mapel, hari, daftarJadwal);
 
@@ -141,7 +143,7 @@ export default function Home() {
       for (let i = 0; i < daftarJadwal.length; i++) {
         const item = daftarJadwal[i];
         const mapel = typeof item === 'string' ? item : item.mapel;
-        if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+        if (mapel.toUpperCase() === 'ISTIRAHAT') continue;
         const { jamMulai } = getJamPelajaran(i, mapel, hari, daftarJadwal);
         if (jamSekarang < jamMulai) {
           nextIndex = i;
@@ -169,7 +171,7 @@ export default function Home() {
       for (let i = index + 1; i < daftarJadwal.length; i++) {
         const item = daftarJadwal[i];
         const mapel = typeof item === 'string' ? item : item.mapel;
-        if (mapel.toUpperCase() === 'ISTIRAHAT' || mapel.toUpperCase() === 'PAGCER') continue;
+        if (mapel.toUpperCase() === 'ISTIRAHAT') continue;
         nextIndex = i;
         break;
       }
@@ -412,7 +414,7 @@ export default function Home() {
                     <span className="live-dot"></span>
                     <div className="live-content">
                       <div className="live-title">
-                        🕐 Sekarang Jam ke-{pelajaranSekarang.index + 1}
+                        🕐 Sekarang Jam ke-{pelajaranSekarang.index}
                       </div>
                       <div className="live-mapel">
                         <strong>{pelajaranSekarang.mapel}</strong>
@@ -430,7 +432,7 @@ export default function Home() {
                     <span className="live-dot next-dot"></span>
                     <div className="live-content">
                       <div className="live-title">
-                        ⏰ Selanjutnya: Jam ke-{pelajaranBerikutnya.index + 1}
+                        ⏰ Selanjutnya: Jam ke-{pelajaranBerikutnya.index}
                       </div>
                       <div className="live-mapel">
                         <strong>{pelajaranBerikutnya.mapel}</strong>
@@ -543,7 +545,7 @@ export default function Home() {
                           background: isBreak ? 'linear-gradient(155deg, #C9A227, #8B6914)' :
                           isActive ? 'linear-gradient(155deg, #4ECDC4, #1A8A7A)' : undefined
                         }}>
-                          {index + 1}
+                          {index}
                         </div>
                         <div>
                           <div className="mapel-name" style={{
